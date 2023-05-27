@@ -1,8 +1,11 @@
 package Clases_auxiliares;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 public class Avion extends Rectangle implements Runnable{
 
@@ -13,12 +16,21 @@ public class Avion extends Rectangle implements Runnable{
 
     Image image = new Image(getClass().getResourceAsStream("/Imagenes/planeSprite.gif"));
 
+    TranslateTransition transition;
+
     public Avion() {
 
         setWidth(50);  //Ancho del objeto
         setHeight(50);  //Alto del objeto
 
         setFill(new ImagePattern(image));
+
+        this.transition = new TranslateTransition(Duration.millis(5000),this);
+
+        transition.setInterpolator(Interpolator.EASE_BOTH);
+
+        Thread hilo = new Thread(this);
+        hilo.start();
 
     }
 
@@ -36,10 +48,23 @@ public class Avion extends Rectangle implements Runnable{
 
     }
 
+    public void avanzarAbajo(){
+
+        transition.setToX(600);
+        transition.setToY(400);
+
+
+
+        transition.play();
+
+    }
+
+
     @Override
     public void run(){
 
-        disminuyeCombustible();
+        //disminuyeCombustible();
+        avanzarAbajo();
 
     }
 

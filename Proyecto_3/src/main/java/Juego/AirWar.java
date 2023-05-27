@@ -44,18 +44,13 @@ AirWar extends Application {
         imageView.setImage(image);
         pane.getChildren().add(imageView);
 
-        Avion avion = new Avion();
+        /*Avion avion = new Avion();
         avion.setX(200);
         avion.setY(200);
         avion.setRotate(180);
 
-        //Hilo del avion
-        Thread hiloAvion = new Thread(avion);
-        hiloAvion.start();
 
-
-
-        pane.getChildren().add(avion);
+        pane.getChildren().add(avion);*/
 
         int barcos_generados = 5,aeropuertos_generados = 8;
 
@@ -78,7 +73,7 @@ AirWar extends Application {
 
             if (red == 63 && green == 71 && blue == 204) {  //Es mar
 
-                Portaaviones portaaviones = new Portaaviones();
+                Portaaviones portaaviones = new Portaaviones(pane);
                 portaaviones.setX(x);
                 portaaviones.setY(y);
 
