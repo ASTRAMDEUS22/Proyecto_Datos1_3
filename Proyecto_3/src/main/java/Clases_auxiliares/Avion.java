@@ -7,7 +7,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-public class Avion extends Rectangle implements Runnable{
+public class Avion extends Rectangle {
 
     int velocidad;
     int eficiencia;
@@ -29,8 +29,7 @@ public class Avion extends Rectangle implements Runnable{
 
         transition.setInterpolator(Interpolator.EASE_BOTH);
 
-        Thread hilo = new Thread(this);
-        hilo.start();
+        avanzarAbajo();
 
     }
 
@@ -56,15 +55,6 @@ public class Avion extends Rectangle implements Runnable{
 
 
         transition.play();
-
-    }
-
-
-    @Override
-    public void run(){
-
-        //disminuyeCombustible();
-        avanzarAbajo();
 
     }
 

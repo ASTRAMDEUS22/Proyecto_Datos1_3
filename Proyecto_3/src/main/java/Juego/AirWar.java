@@ -1,7 +1,7 @@
 package Juego;
 
 import Clases_auxiliares.Aeropuerto;
-import Clases_auxiliares.Avion;
+import Clases_auxiliares.LineaArista;
 import Clases_auxiliares.Portaaviones;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -15,6 +15,7 @@ import javafx.stage.Stage;
 
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -27,6 +28,15 @@ AirWar extends Application {
 
     Label label;
 
+    //ArrayList<Portaaviones> listaPortaaviones = new ArrayList<>();
+
+    ArrayList<Portaaviones> listaPortaaviones = new ArrayList<>();
+    ArrayList<Aeropuerto> listaAeropuertos = new ArrayList<>();
+
+    Pane pane;
+
+    Random random = new Random();
+
 
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
@@ -35,7 +45,7 @@ AirWar extends Application {
         label.setText("hiii");
 
         //String rutaLocal = "Imagenes/mapaMundi.png";
-        Pane pane = new Pane();
+        this.pane = new Pane();
 
 
 
@@ -44,21 +54,14 @@ AirWar extends Application {
         imageView.setImage(image);
         pane.getChildren().add(imageView);
 
-        /*Avion avion = new Avion();
-        avion.setX(200);
-        avion.setY(200);
-        avion.setRotate(180);
-
-
-        pane.getChildren().add(avion);*/
-
         int barcos_generados = 5,aeropuertos_generados = 8;
 
         int minAlto = 0,maxAlto = 700,minAncho = 0,maxAncho = 1500;
 
         PixelReader pixelReader = image.getPixelReader();
 
-        while (barcos_generados > 0){
+        //Generar barcos
+        while (barcos_generados != 0){
 
             Random random = new Random();
 
@@ -73,11 +76,13 @@ AirWar extends Application {
 
             if (red == 63 && green == 71 && blue == 204) {  //Es mar
 
-                Portaaviones portaaviones = new Portaaviones(pane);
+                Portaaviones portaaviones = new Portaaviones();
+                portaaviones.setPane(pane);
                 portaaviones.setX(x);
                 portaaviones.setY(y);
 
                 pane.getChildren().add(portaaviones);
+                listaPortaaviones.add(portaaviones);
 
                 barcos_generados--;
 
@@ -85,6 +90,7 @@ AirWar extends Application {
 
         }
 
+        //Generar aeropuertos
         while (aeropuertos_generados > 0){
 
             Random random = new Random();
@@ -106,6 +112,7 @@ AirWar extends Application {
                 aeropuerto.setY(y);
 
                 pane.getChildren().addAll(aeropuerto);
+                listaAeropuertos.add(aeropuerto);
 
                 aeropuertos_generados--;
 
@@ -113,7 +120,7 @@ AirWar extends Application {
 
         }
 
-
+        crearAristas();
 
         Scene scene = new Scene(pane,1500,800);
         primaryStage.setResizable(false);
@@ -121,4 +128,140 @@ AirWar extends Application {
         primaryStage.show();
 
     }
+
+    public void crearAristas() {
+
+        generarLineaPortaaviones();
+        generarLineaAeropuerto();
+
+    }
+
+    public void generarLineaPortaaviones(){
+
+        //Ejecuta mientras el índice este en la lista
+        for (int i = 0;i < listaPortaaviones.size();i++){
+
+            //Genera un número aleatorio
+            int aleatorio = random.nextInt(listaPortaaviones.size());
+
+            //Generará números aleatorios mientras que el elemento actual sea igual al elemento aleatorio
+            while (listaPortaaviones.get(i) == listaPortaaviones.get(aleatorio)){
+
+                aleatorio = random.nextInt(listaPortaaviones.size());
+
+            }
+
+            //Recorre los demás elementos de la lista menos el primero
+            for (int j = i + 1;j < listaPortaaviones.size();j++){
+
+                //Probabilidad de 1/2 de generar una línea
+                int probabilidad = random.nextInt(10);
+
+                if (probabilidad > 2) {
+                    generaPortaPorta(listaPortaaviones.get(i), listaPortaaviones.get(j));
+                }
+            }
+
+            //Recorre la lista de aeropuertos para generar conexiones aleatorias
+            for (Aeropuerto listaAeropuerto : listaAeropuertos) {
+
+                int probabilidad = random.nextInt(10);
+
+                if (probabilidad > 4) {
+
+                    generaPortaAero(listaPortaaviones.get(i), listaAeropuerto);
+
+                }
+
+            }
+
+
+        }
+    }
+
+    public void generarLineaAeropuerto(){
+
+        //Ejecuta mientras el índice este en la lista
+        for (int i = 0;i < listaAeropuertos.size();i++){
+
+            //Genera un número aleatorio
+            int aleatorio = random.nextInt(listaAeropuertos.size());
+
+            //Generará números aleatorios mientras que el elemento actual sea igual al elemento aleatorio
+            while (listaAeropuertos.get(i) == listaAeropuertos.get(aleatorio)){
+
+                aleatorio = random.nextInt(listaAeropuertos.size());
+
+            }
+
+            //Recorre la lista menos el primero elemento
+            for (int j = i + 1;j < listaAeropuertos.size();j++) {
+
+                int probabilidad = random.nextInt(10);
+
+                //Una probabilidad más alta de generar aristas, ya que hay más aeropuertos que portaaviones
+                if (probabilidad > 4){
+
+                    generaAeroAero(listaAeropuertos.get(i), listaAeropuertos.get(j));
+
+                }
+            }
+
+            //Recorre la lista de portaaviones para generar conexiones aleatorias
+            for (Portaaviones listaPortaavione : listaPortaaviones) {
+
+                int probabilidad = random.nextInt(10);
+
+                if (probabilidad > 3) {
+
+                    generaAeroPorta(listaAeropuertos.get(i), listaPortaavione);
+
+                }
+
+            }
+
+        }
+    }
+
+    public void generaPortaPorta(Portaaviones portaaviones,Portaaviones portaavionesRandom){
+
+        LineaArista lineaArista = new LineaArista();
+
+        lineaArista.generarLinea(portaaviones,portaavionesRandom);
+
+        pane.getChildren().add(lineaArista);
+
+    }
+
+    public void generaAeroAero(Aeropuerto aeropuerto,Aeropuerto aeropuertoRandom){
+
+        LineaArista lineaArista = new LineaArista();
+
+        lineaArista.generarLinea(aeropuerto,aeropuertoRandom);
+
+        pane.getChildren().add(lineaArista);
+
+    }
+
+    public void generaPortaAero(Portaaviones portaaviones,Aeropuerto aeropuertoRandom){
+
+        LineaArista lineaArista = new LineaArista();
+
+        lineaArista.generarLinea(portaaviones,aeropuertoRandom);
+
+        pane.getChildren().add(lineaArista);
+
+    }
+
+    public void generaAeroPorta(Aeropuerto aeropuerto,Portaaviones portaavionesRandom){
+
+        LineaArista lineaArista = new LineaArista();
+
+        lineaArista.generarLinea(aeropuerto,portaavionesRandom);
+
+        pane.getChildren().add(lineaArista);
+
+    }
+
+
 }

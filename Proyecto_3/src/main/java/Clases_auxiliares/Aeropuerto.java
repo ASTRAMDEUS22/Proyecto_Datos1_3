@@ -23,6 +23,11 @@ public class Aeropuerto extends Rectangle {
     int combustible = 100;
     int distribucion_combustible = racionarCombustible();
 
+    //Punto de llegada
+    LineaArista linea_llegada;
+    //Punto de salida
+    LineaArista linea_salida;
+
     public Aeropuerto(){
 
         setWidth(ancho);  //Ancho
@@ -35,6 +40,8 @@ public class Aeropuerto extends Rectangle {
         setFill(new ImagePattern(image));
 
     }
+
+
 
     public int maximoAleatorio(){
 
@@ -63,7 +70,19 @@ public class Aeropuerto extends Rectangle {
 
     }
 
+    public LineaArista getLinea_llegada() {
+        return linea_llegada;
+    }
 
+    public void setLinea_llegada(LineaArista linea_llegada) {
+        this.linea_llegada = linea_llegada;
+    }
 
+    public LineaArista getLinea_salida() {
+        return linea_salida;
+    }
 
+    public void setLinea_salida(LineaArista linea_salida) {
+        this.linea_salida = linea_salida;
+    }
 }
