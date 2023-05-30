@@ -139,10 +139,22 @@ public class LineaArista extends Line{
 
         //System.out.println(distancia);
 
-
     }
 
+    public double obtenerAngulo(){
 
+        //Diferencias entre coordenadas
+        double dx = getEndX() - getStartX();
+        double dy = getEndY() - getStartY();
 
+        // Calcula el ángulo en radianes
+        double angleRadians = Math.atan2(dy, dx);
+
+        // Convierte el ángulo a grados
+        double angleDegrees = Math.toDegrees(angleRadians);
+
+        return angleDegrees;
+
+    }
 
 }

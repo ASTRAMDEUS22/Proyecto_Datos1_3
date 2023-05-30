@@ -121,6 +121,7 @@ AirWar extends Application {
         }
 
         crearAristas();
+        jajaja();
 
         Scene scene = new Scene(pane,1500,800);
         primaryStage.setResizable(false);
@@ -262,6 +263,22 @@ AirWar extends Application {
         pane.getChildren().add(lineaArista);
 
     }
+
+    public void jajaja(){
+
+        System.out.println("Origen: " + listaPortaaviones.get(0).getX() + " " + listaPortaaviones.get(0).getY());
+        listaPortaaviones.get(0).instanciarAviones(
+                listaPortaaviones.get(0).getComienzoLinea_X(),
+                listaPortaaviones.get(0).getComienzoLinea_Y(),
+                listaPortaaviones.get(0).getFinLinea_X(),
+                listaPortaaviones.get(0).getFinLinea_Y(),
+                listaPortaaviones.get(0).getLinea_salida().obtenerAngulo()
+        );
+
+
+
+    }
+
 
 
 }

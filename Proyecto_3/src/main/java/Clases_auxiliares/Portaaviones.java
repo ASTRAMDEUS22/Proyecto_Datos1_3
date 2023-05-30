@@ -3,13 +3,9 @@ package Clases_auxiliares;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-
-import java.util.Random;
 
 
 public class Portaaviones extends Rectangle implements Runnable{
@@ -74,9 +70,16 @@ public class Portaaviones extends Rectangle implements Runnable{
 
     }
 
-    public void instanciarAviones(){
+    public void instanciarAviones(double inicioX,double inicioY,double finX,double finY,double anguloInclinacion){
 
-        while (cont > 0){
+        Avion avion = new Avion(inicioX,inicioY,finX,finY,anguloInclinacion);
+        avion.setRotate(linea_llegada.getRotate());
+
+        Platform.runLater(() -> {
+            pane.getChildren().add(avion);
+        });
+
+        /*while (cont > 0){
 
             try {
                 Thread.sleep(1000);
@@ -107,7 +110,7 @@ public class Portaaviones extends Rectangle implements Runnable{
 
             cont--;
 
-        }
+        }*/
 
     }
 
@@ -119,16 +122,28 @@ public class Portaaviones extends Rectangle implements Runnable{
     }
 
 
-    public LineaArista getLinea_llegada() {
-        return linea_llegada;
+    public double getFinLinea_X() {
+        return linea_salida.getEndX();
+    }
+
+    public double getFinLinea_Y(){
+        return linea_salida.getEndY();
+    }
+
+    public double getComienzoLinea_X() {
+        return linea_salida.getStartX();
+    }
+
+    public double getComienzoLinea_Y() {
+        return linea_salida.getStartY();
+    }
+
+    public LineaArista getLinea_salida(){
+        return linea_salida;
     }
 
     public void setLinea_llegada(LineaArista linea_llegada) {
         this.linea_llegada = linea_llegada;
-    }
-
-    public LineaArista getLinea_salida() {
-        return linea_salida;
     }
 
     public void setLinea_salida(LineaArista linea_salida) {
