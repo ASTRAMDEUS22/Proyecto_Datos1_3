@@ -1,9 +1,19 @@
 package Clases_auxiliares;
 import java.util.ArrayList;
+import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortDataListener;
+import com.fazecast.jSerialComm.SerialPortEvent;
 
 import java.util.Scanner;
 public class Main {
+    private static SerialPort serialPort;
+    private static int counter;
+    private static int finalNumber = 5;
+    public static boolean counting;
     public static void main(String args[]){
+        ArduinoController();
+        counting = true;
+        loop();
         System.out.print("Crear aleatoriamente?[y/n]:");
         Graph g;
         Scanner in =new Scanner(System.in);
@@ -132,7 +142,70 @@ public class Main {
         else{    //just in case the path from a to b is non existent
             System.out.println("Nodo:"+(from+1)+" No esta conectado:"+(to+1));
         }
-
     }
+    public static void ArduinoController(){
+        serialPort = SerialPort.getCommPort("COM6");
+        serialPort.openPort();
+        serialPort.setComPortParameters(9600, Byte.SIZE, serialPort.ONE_STOP_BIT, serialPort.NO_PARITY);
+        serialPort.setComPortTimeouts(serialPort.TIMEOUT_WRITE_BLOCKING,0,0);
+        boolean hasOpened = serialPort.openPort();
+        if (!hasOpened){
+            throw new IllegalStateException("Failed to open serial port");
+        }
+        serialPort.addDataListener(new SerialPortDataListener() {
+            @Override
+            public int getListeningEvents() {
+                return SerialPort.LISTENING_EVENT_DATA_AVAILABLE;
+            }
 
+            @Override
+            public void serialEvent(SerialPortEvent serialPortEvent) {
+                if (serialPortEvent.getEventType() != SerialPort.LISTENING_EVENT_DATA_AVAILABLE) return;
+                byte[] newData = new byte[serialPort.bytesAvailable()];
+                int numRead = serialPort.readBytes(newData, newData.length);
+                String data = new String(newData);
+                switch (data){
+                    case "U":
+                        System.out.println("UP");
+                        break;
+                    case "D":
+                        System.out.println("DOWN");
+                        break;
+                    case "S":
+                        System.out.println("SELECT");
+                        break;
+                }
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(new Thread(serialPort::closePort));
+    }
+    public static void sendData(String data){
+        byte[] message = data.getBytes();
+        System.out.println("pass");
+        serialPort.writeBytes(message,message.length);
+    }
+    public static void loop() {
+        while (counting) {
+            String message = String.valueOf(counter);
+            sendData(String.valueOf(counter));
+            System.out.println(message);
+
+            counter++;
+            if (counter > finalNumber) {
+                counter = 1;
+            }
+            if (!counting) {
+                System.out.println("Counter value: " + counter);
+                if (counter == 3) {
+                    sendData("M");
+                }
+            }
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

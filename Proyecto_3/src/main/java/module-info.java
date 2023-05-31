@@ -11,6 +11,7 @@ module Juego {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires opencv;
+    requires com.fazecast.jSerialComm;
 
     opens Juego to javafx.fxml;
     exports Juego;
