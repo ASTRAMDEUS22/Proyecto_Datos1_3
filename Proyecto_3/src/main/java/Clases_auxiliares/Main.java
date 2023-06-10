@@ -208,4 +208,64 @@ public class Main {
             }
         }
     }
+    /*
+    public static void insertionSort(){
+        int in;
+        int out;
+        for (out = 1; out < vList.length; out++){
+            long temp = vList[out];
+            in = out;
+            while (in > 0 && vList[in-1] >= temp){
+                vList[in] = vList[in-1];
+                --in;
+            }
+            vList[in] = temp;
+        }
+    }
+    public static void shellSort(Comparable[] a){
+        int N = efList.length;
+        int h = 1;
+        while(h < N/3) h = 3*h +1;
+        while (h >= 1){
+            for (int i = h; i < N; i++){
+                for (int j = i; j >= h && efList[j] < efList[j-h]; j -= h){
+                    Comparable temp = efList[j];
+                    efList[j] = efList[j - h];
+                    efList[j - h] = temp
+                }
+            }
+            h /= 3;
+        }
+    }
+    */
+    public static void insertionSort(LinkedList<Long> list) {
+        for (int i = 1; i < list.size(); i++) {
+            long temp = list.get(i);
+            int j = i - 1;
+            while (j >= 0 && list.get(j) > temp) {
+                list.set(j + 1, list.get(j));
+                j--;
+            }
+            list.set(j + 1, temp);
+        }
+    }
+    public static void shellSort(LinkedList<Comparable> list) {
+        int N = list.size();
+        int h = 1;
+        while (h < N / 3)
+            h = 3 * h + 1;
+
+        while (h >= 1) {
+            for (int i = h; i < N; i++) {
+                Comparable temp = list.get(i);
+                int j = i;
+                while (j >= h && list.get(j - h).compareTo(temp) > 0) {
+                    list.set(j, list.get(j - h));
+                    j -= h;
+                }
+                list.set(j, temp);
+            }
+            h /= 3;
+        }
+    }
 }
