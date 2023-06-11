@@ -14,4 +14,6 @@ module Juego {
 
     opens Juego to javafx.fxml;
     exports Juego;
+    opens Servidor to javafx.fxml;
+    exports Servidor;
 }

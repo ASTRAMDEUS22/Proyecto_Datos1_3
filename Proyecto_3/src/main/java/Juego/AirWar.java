@@ -1,11 +1,8 @@
 package Juego;
 
-import Clases_auxiliares.Aeropuerto;
-import Clases_auxiliares.LineaArista;
-import Clases_auxiliares.Portaaviones;
+import Clases_auxiliares.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -15,58 +12,98 @@ import javafx.stage.Stage;
 
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
 
 
 public class
-AirWar extends Application {
+AirWar extends Application implements Runnable{
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    Label label;
-
-    //ArrayList<Portaaviones> listaPortaaviones = new ArrayList<>();
-
+    //Listas
     ArrayList<Portaaviones> listaPortaaviones = new ArrayList<>();
     ArrayList<Aeropuerto> listaAeropuertos = new ArrayList<>();
 
+    //Pane
     Pane pane;
 
+    //Random
     Random random = new Random();
+
+    //Ints
+    final static int minAlto = 1,maxAlto = 627,minAncho = 1,maxAncho = 1356,maxPorta = 8,minPorta = 4,minAero = 5,
+            maxAero = 12;
+
+    //Conexion con el servidor
+    final static String host = "localhost";
+    final static int localport = 4444,serverPort = 2222;
+
+    //Socket servidor
+    ServerSocket serverSocket;
+
+    //Hashmap para conectar una línea y un portaavion
+    HashMap<LineaArista, Object> mapaDestinos = new HashMap<>();
+
+
+    //Lista de aviones
+    ArrayList<Avion> listaAviones = new ArrayList<>();
+
+    //Generar contador de tiempo general
+    Temporizador temporizador = new Temporizador(
+            listaAviones,
+            listaPortaaviones,
+            listaAeropuertos
+    );
+
+
+    public AirWar(){
+
+        try {
+            this.serverSocket = new ServerSocket(localport);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Thread thread = new Thread(this);
+        thread.start();
+
+    }
 
 
     @Override
-    public void start(Stage primaryStage) throws FileNotFoundException {
+    public void start(Stage primaryStage) {
 
-        label = new Label();
-        label.setText("hiii");
-
-        //String rutaLocal = "Imagenes/mapaMundi.png";
         this.pane = new Pane();
 
+        temporizador.iniciarCont();
 
-
-        Image image = new Image(getClass().getResourceAsStream("/Imagenes/mapaDelMundo.jpg"));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Imagenes/Mapa_Mudo_del_Mundo.png")));
         ImageView imageView = new ImageView();
         imageView.setImage(image);
         pane.getChildren().add(imageView);
 
-        int barcos_generados = 5,aeropuertos_generados = 8;
-
-        int minAlto = 0,maxAlto = 700,minAncho = 0,maxAncho = 1500;
+        int barcos_generados = generarPortaRandom(),aeropuertos_generados = generarAeroRandom();
 
         PixelReader pixelReader = image.getPixelReader();
+
+        //Índice para identificar los barcos
+        int i = 0;
 
         //Generar barcos
         while (barcos_generados != 0){
 
-            Random random = new Random();
-
-            int y = random.nextInt(maxAlto - minAlto + 1) + minAlto;
-            int x = random.nextInt(maxAncho - minAncho + 1) + minAncho;
+            int x = generarCoordsRandomX();
+            int y = generarCoordsRandomY();
 
             Color color = pixelReader.getColor(x,y);
 
@@ -74,7 +111,7 @@ AirWar extends Application {
             int green = (int) (color.getGreen() * 255);
             int blue = (int) (color.getBlue() * 255);
 
-            if (red == 63 && green == 71 && blue == 204) {  //Es mar
+            if (red == 63 && green == 72 && blue == 204) {  //Es mar
 
                 Portaaviones portaaviones = new Portaaviones();
                 portaaviones.setPane(pane);
@@ -84,19 +121,28 @@ AirWar extends Application {
                 pane.getChildren().add(portaaviones);
                 listaPortaaviones.add(portaaviones);
 
+                //Pasarle la lista global de aviones
+                portaaviones.setListaAviones(listaAviones);
+
+                portaaviones.setLabelText(String.valueOf(i));
+                portaaviones.crearLabel();
+
                 barcos_generados--;
+                i++;
 
             }
 
         }
 
+        //Reiniciar el índice
+        i = 0;
+
         //Generar aeropuertos
         while (aeropuertos_generados > 0){
 
-            Random random = new Random();
+            int x = generarCoordsRandomX();
+            int y = generarCoordsRandomY();
 
-            int y = random.nextInt(maxAlto - minAlto + 1) + minAlto;
-            int x = random.nextInt(maxAncho - minAncho + 1) + minAncho;
 
             Color color = pixelReader.getColor(x,y);
 
@@ -104,26 +150,35 @@ AirWar extends Application {
             int green = (int) (color.getGreen() * 255);
             int blue = (int) (color.getBlue() * 255);
 
-            if (red != 63 && green != 71 && blue != 204) {  //Es mar
+            if (red != 63 && green != 71 && blue != 204) {  //Es tierra
 
                 //Instancia de un aeropuerto
                 Aeropuerto aeropuerto = new Aeropuerto();
                 aeropuerto.setX(x);
                 aeropuerto.setY(y);
+                aeropuerto.setPane(pane);
+
+                //Pasarle la lista global de aviones
+                aeropuerto.setListaAviones(listaAviones);
 
                 pane.getChildren().addAll(aeropuerto);
                 listaAeropuertos.add(aeropuerto);
 
+                aeropuerto.setLabelText(String.valueOf(i));
+                aeropuerto.crearLabel();
+
                 aeropuertos_generados--;
+
+                i++;
 
             }
 
         }
 
         crearAristas();
-        jajaja();
+        generarAviones();
 
-        Scene scene = new Scene(pane,1500,800);
+        Scene scene = new Scene(pane,maxAncho + 1,maxAlto + 1);
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -146,7 +201,7 @@ AirWar extends Application {
             int aleatorio = random.nextInt(listaPortaaviones.size());
 
             //Generará números aleatorios mientras que el elemento actual sea igual al elemento aleatorio
-            while (listaPortaaviones.get(i) == listaPortaaviones.get(aleatorio)){
+            while (listaPortaaviones.get(i).equals(listaPortaaviones.get(aleatorio))){
 
                 aleatorio = random.nextInt(listaPortaaviones.size());
 
@@ -189,7 +244,7 @@ AirWar extends Application {
             int aleatorio = random.nextInt(listaAeropuertos.size());
 
             //Generará números aleatorios mientras que el elemento actual sea igual al elemento aleatorio
-            while (listaAeropuertos.get(i) == listaAeropuertos.get(aleatorio)){
+            while (listaAeropuertos.get(i).equals(listaAeropuertos.get(aleatorio))){
 
                 aleatorio = random.nextInt(listaAeropuertos.size());
 
@@ -224,11 +279,29 @@ AirWar extends Application {
         }
     }
 
+    private int generarCoordsRandomX(){
+        return random.nextInt(maxAncho - minAncho + 1) + minAncho;
+    }
+
+    private int generarCoordsRandomY() {
+        return random.nextInt(maxAlto - minAlto + 1) + minAlto;
+    }
+
+    private int generarPortaRandom(){return random.nextInt(maxPorta - minPorta + 1) + minPorta;}
+
+    private int generarAeroRandom(){return random.nextInt(maxAero - minAero + 1) + minAero;}
+
+
     public void generaPortaPorta(Portaaviones portaaviones,Portaaviones portaavionesRandom){
 
         LineaArista lineaArista = new LineaArista();
 
-        lineaArista.generarLinea(portaaviones,portaavionesRandom);
+        lineaArista = lineaArista.generarLinea(portaaviones,portaavionesRandom);
+
+        //Conecta la línea con el portaaviones de salida
+        mapaDestinos.put(lineaArista,portaaviones);
+        mapaDestinos.put(lineaArista,portaavionesRandom);
+
 
         pane.getChildren().add(lineaArista);
 
@@ -238,7 +311,13 @@ AirWar extends Application {
 
         LineaArista lineaArista = new LineaArista();
 
-        lineaArista.generarLinea(aeropuerto,aeropuertoRandom);
+        lineaArista = lineaArista.generarLinea(aeropuerto,aeropuertoRandom);
+
+        //Conecta la línea con el portaaviones de salida
+        mapaDestinos.put(lineaArista,aeropuerto);
+        mapaDestinos.put(lineaArista,aeropuertoRandom);
+
+
 
         pane.getChildren().add(lineaArista);
 
@@ -248,7 +327,13 @@ AirWar extends Application {
 
         LineaArista lineaArista = new LineaArista();
 
-        lineaArista.generarLinea(portaaviones,aeropuertoRandom);
+        lineaArista = lineaArista.generarLinea(portaaviones,aeropuertoRandom);
+
+        //Conecta la línea con el portaaviones de salida
+        mapaDestinos.put(lineaArista,portaaviones);
+        mapaDestinos.put(lineaArista,aeropuertoRandom);
+
+
 
         pane.getChildren().add(lineaArista);
 
@@ -258,24 +343,113 @@ AirWar extends Application {
 
         LineaArista lineaArista = new LineaArista();
 
-        lineaArista.generarLinea(aeropuerto,portaavionesRandom);
+        lineaArista = lineaArista.generarLinea(aeropuerto,portaavionesRandom);
+
+        //Conecta la línea con el portaaviones de salida
+        mapaDestinos.put(lineaArista,aeropuerto);
+        mapaDestinos.put(lineaArista,portaavionesRandom);
+
+
 
         pane.getChildren().add(lineaArista);
 
     }
 
-    public void jajaja(){
+    public void generarAviones(){
 
-        System.out.println("Origen: " + listaPortaaviones.get(0).getX() + " " + listaPortaaviones.get(0).getY());
-        listaPortaaviones.get(0).instanciarAviones(
-                listaPortaaviones.get(0).getComienzoLinea_X(),
-                listaPortaaviones.get(0).getComienzoLinea_Y(),
-                listaPortaaviones.get(0).getFinLinea_X(),
-                listaPortaaviones.get(0).getFinLinea_Y(),
-                listaPortaaviones.get(0).getLinea_salida().obtenerAngulo()
-        );
+        Mensaje mensaje = new Mensaje("listaPortaaviones");
+
+        ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+
+        for (Portaaviones portaaviones: listaPortaaviones){
+
+            Mensaje mensaje1 = new Mensaje();
+
+            portaaviones.setHashMap(mapaDestinos);
+
+            portaaviones.instanciarAviones();
+
+            //Obtener el índice del portaavion en la lista
+            mensaje1.setI(Integer.parseInt(portaaviones.getLabelText()));
+
+            listaMensajes.add(mensaje1);
+
+        }
+
+        for (Aeropuerto aeropuerto : listaAeropuertos){
+
+            aeropuerto.setHashMap(mapaDestinos);
+            aeropuerto.instanciarAviones();
+
+        }
+
+        //System.out.println(mapaDestinos.size());
+
+        mensaje.setListaMensajes(listaMensajes);
+
+        enviarMensajeServidor(mensaje);
+
+    }
+
+    public void crearAvion(int i){
+
+        listaPortaaviones.get(i).instanciarAviones();
+
+    }
+
+    public void enviarMensajeServidor(Mensaje mensaje){
+
+        try {
+            //Crear un socket
+            Socket socket = new Socket(host, serverPort);
+
+            //Crear medio para enviar información
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
+            out.writeObject(mensaje);
+
+            socket.close();
+            out.close();
 
 
+        }catch (IOException e) {
+            System.out.println("No se pudo conectar con el Servidor: " + host + " " + serverPort);
+        }
+
+    }
+
+    @Override
+    public void run(){
+
+        try {
+
+            while (true){
+
+                //Acepta el socket entrante
+                Socket socket = serverSocket.accept();
+
+                //Recibe el objeto enviado por el socket
+                ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+
+                Mensaje mensaje = (Mensaje) in.readObject();
+
+                switch (mensaje.getAccion()){
+
+                    case "crearAvion" -> {
+
+                        crearAvion(mensaje.getI());
+
+                    }
+
+                }
+
+                socket.close();
+
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 

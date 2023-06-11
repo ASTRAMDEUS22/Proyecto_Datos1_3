@@ -1,85 +1,160 @@
 package Clases_auxiliares;
 
-import javafx.animation.Interpolator;
-import javafx.animation.TranslateTransition;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
+import javafx.animation.PathTransition;
+//import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+//import java.util.Objects;
+import java.util.Random;
 
-public class Avion extends Rectangle {
+public class Avion extends Rectangle implements Serializable {
 
-    int velocidad;
-    int eficiencia;
-    int fortaleza;
-    int combustible = 100;
+    private Random random = new Random();
 
-    double inicioX,inicioY,finX,finY,anguloInclinacion;
+    //Velocidad del avión
+    private int velocidad = definirVelocidad();
 
-    Image image = new Image(getClass().getResourceAsStream("/Imagenes/planeSprite.gif"));
+    //Consumo de combstible por segundo
+    private int eficiencia = 10;
 
-    TranslateTransition transition;
+    //Vida del avión ante los disparos
+    private int fortaleza = 2;
 
-    public Avion(double inicioX,double inicioY,double finX,double finY,double anguloInclinacion) {
+    //Combustible total del avión
+    private int combustible = 100;
 
-        setWidth(50);  //Ancho del objeto
-        setHeight(50);  //Alto del objeto
 
-        //Coordenadas donde empezará y terminará el avión
-        this.inicioX = inicioX;
-        this.inicioY = inicioY;
-        this.finX = finX;
-        this.finY = finY;
-        this.anguloInclinacion = anguloInclinacion;
+    private double distancia;
 
-        setFill(new ImagePattern(image));
+    private double inicioX,inicioY,finX,finY;
 
-        //Coords de spawn del avión
-        setX(inicioX);
-        setY(inicioY);
+    private Path path;
 
-        this.transition = new TranslateTransition(Duration.millis(5000),this);
+    private HashMap<LineaArista,Object> hashMap;
 
-        transition.setInterpolator(Interpolator.EASE_BOTH);
+    private LineaArista lineaLocal;
 
-        moverAvion();
+    private Pane pane;
 
-    }
+    private boolean recargando_combustible = false;
 
-    public void disminuyeCombustible(){
-        while (true) {
-            System.out.println(combustible);
-            this.combustible-=3.5;
+    private Object zonaAterrizaje;
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    //TranslateTransition transition;
+    private PathTransition pathTransition = new PathTransition();
+
+    public Avion() {
+
+        setWidth(10);  //Ancho del objeto
+        setHeight(10);  //Alto del objeto
+
+        setStyle("-fx-fill: #c5bc0c");
 
     }
 
     public void moverAvion(){
 
-        System.out.println("Destino: " + finX + " " + finY);
+        definirVelocidad();
 
-        System.out.println("Angulo de inclinación: " + anguloInclinacion);
+        //setRotate(45);
 
-        /*Rotate rotate = new Rotate(anguloInclinacion,getWidth() / 2,getHeight() / 2);
+        double desplazamiento = distancia / velocidad;
 
-        getTransforms().add(rotate);*/
+        pathTransition.setNode(this);
+        pathTransition.setPath(path);
+        pathTransition.setDuration(Duration.seconds(desplazamiento));
+        pathTransition.play();
+
+        recargando_combustible = false;
+
+        //Evento que detecta si el avión llega a su destino
+        pathTransition.setOnFinished(event -> {
+
+            Object object = hashMap.get(lineaLocal);
+
+            //Si el objeto es portaaviones
+            if (object instanceof Portaaviones temp){
+
+                //Si no se puede almacenar más aviones siga reduciendo el combustible, si no, que recargue
+                if (temp.almacenarAvion(this)){
+                    this.recargando_combustible = true;
+                }
+
+                //Indica que está en un nodo y procede a recargar combustible
+                //this.recargando_combustible = true;
+
+                //Se solicita recarga de combustible
+                this.combustible = temp.solicitarRecarga();
 
 
+            }
+            //Si el objeto es aeropuerto
+            else if (object instanceof Aeropuerto temp){
 
-        transition.setToX(finX - inicioX);
-        transition.setToY(finY - inicioY);
+                //Si no se puede almacenar más aviones siga reduciendo el combustible, si no, que recargue
+                if (temp.almacenarAvion(this)){
+                    this.recargando_combustible = true;
+                }
+
+                //System.out.println(recargando_combustible);
+
+                //Se solicita recarga de combustible
+                this.combustible = temp.solicitarRecarga();
+
+            }
+
+        });
 
 
+    }
 
-        transition.play();
+    public void calcularDistancia(double startX,double startY,double endX,double endY){
 
+        //Distancia entre el punto de inicio y llegada
+        distancia = Math.sqrt(Math.pow(endX - startX,2) + Math.pow(endY - startY,2));
+
+    }
+
+    public int definirVelocidad(){
+
+        int maxFast = 120, minFast = 80;
+
+        return random.nextInt(maxFast - minFast + 1) + minFast;
+
+    }
+
+    public void destruirAvion(int i,ArrayList<Avion> listaAviones){
+
+        pane.getChildren().remove(this);
+        listaAviones.remove(i);
+
+    }
+
+    public int getCombustible() {
+        return combustible;
+    }
+
+    public void disminuirCombustible(int i, ArrayList<Avion> listaAviones) {
+
+        int x = this.combustible - eficiencia;
+
+        System.out.println(x);
+
+        //Si el avion se queda sin combustible
+        if (x <= 0){
+
+            destruirAvion(i,listaAviones);
+
+        }
+        else {
+
+            this.combustible -= eficiencia;
+        }
     }
 
     public int getVelocidad() {
@@ -104,5 +179,67 @@ public class Avion extends Rectangle {
 
     public void setFortaleza(int fortaleza) {
         this.fortaleza = fortaleza;
+    }
+
+    //Getters y setters de el inicio y fin del vuelo del avión
+
+    public double getInicioX() {
+        return inicioX;
+    }
+
+    public void setInicioX(double inicioX) {
+        this.inicioX = inicioX;
+    }
+
+    public double getInicioY() {
+        return inicioY;
+    }
+
+    public void setInicioY(double inicioY) {
+        this.inicioY = inicioY;
+    }
+
+    public double getFinX() {
+        return finX;
+    }
+
+    public void setFinX(double finX) {
+        this.finX = finX;
+    }
+
+    public double getFinY() {
+        return finY;
+    }
+
+    public void setFinY(double finY) {
+        this.finY = finY;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
+    }
+
+    public HashMap<LineaArista, Object> getHashMap() {
+        return hashMap;
+    }
+
+    public void setHashMap(HashMap<LineaArista, Object> hashMap) {
+        this.hashMap = hashMap;
+    }
+
+    public void setLineaLocal(LineaArista lineaLocal) {
+        this.lineaLocal = lineaLocal;
+    }
+
+    public void setPane(Pane pane) {
+        this.pane = pane;
+    }
+
+    public boolean isRecargando_combustible() {
+        return recargando_combustible;
+    }
+
+    public void setRecargando_combustible(boolean recargando_combustible) {
+        this.recargando_combustible = recargando_combustible;
     }
 }

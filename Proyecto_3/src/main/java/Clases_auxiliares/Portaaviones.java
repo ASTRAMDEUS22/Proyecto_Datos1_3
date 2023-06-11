@@ -1,32 +1,57 @@
 package Clases_auxiliares;
 
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Random;
 
 
-public class Portaaviones extends Rectangle implements Runnable{
+public class Portaaviones extends Rectangle implements Serializable {
 
     //Imagen del aeropuerto
-    Image image = new Image(getClass().getResourceAsStream("/Imagenes/portaAviones.png"));
+    private Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Imagenes/portaAviones.png")));
 
-    int cont = 10000;
 
-    Pane pane;
+    private Random random = new Random();
 
-    //Punto de llegada
-    LineaArista linea_llegada;
-    //Punto de salida
-    LineaArista linea_salida;
+    private Pane pane;
 
     //Label para saber cuál portaavión de la lista es
-    Label label = new Label();
+    private Label label = new Label();
 
     //Texto del label
-    String labelText;
+    private String labelText;
+
+    //Lista de líneas
+    private ArrayList<LineaArista> listaLineasSalida = new ArrayList<>();
+    private ArrayList<LineaArista> listaLineasLlegada = new ArrayList<>();
+
+    //Mapa de líneas con Portaaviones y Aeropuertos
+    private HashMap<LineaArista,Object> hashMap;
+
+    //Hangar que delimita el máximo de aviones en el portaavion
+    private ArrayList<Avion> hangar = new ArrayList<>();
+    private final int limiteAviones = 5;
+
+    private ArrayList<Avion> listaAviones;
+
+    //Combustible total del Portaavion
+    private int combustible = 100;
+    private final int recarga_por_segundo = 10;
+    private final int racionar = racionarCombustible();
+
+
+    //Instancia de un Timeline para manejar la generación de aviones cada n segundos
+    private Timeline timeline;
 
     public Portaaviones(){
 
@@ -35,31 +60,12 @@ public class Portaaviones extends Rectangle implements Runnable{
 
         setFill(new ImagePattern(image));
 
-        Thread hilo = new Thread(this);
-        hilo.start();
-
-        this.pane = pane;
-
-    }
-
-    @Override
-    public boolean equals(Object object){
-        if (this == object) {
-            return true;
-        }
-        if (object == null || getClass() != object.getClass()) {
-            return false;
-        }
-        return true;
     }
 
     public void crearLabel(){
 
-        //System.out.println(getX() + "  " + getY());
-
         label.setTranslateX(getX() + 25);
         label.setTranslateY(getY());
-
 
 
         label.setStyle("-fx-text-fill: #ffffff");
@@ -70,84 +76,178 @@ public class Portaaviones extends Rectangle implements Runnable{
 
     }
 
-    public void instanciarAviones(double inicioX,double inicioY,double finX,double finY,double anguloInclinacion){
+    public void instanciarAviones(){
 
-        Avion avion = new Avion(inicioX,inicioY,finX,finY,anguloInclinacion);
-        avion.setRotate(linea_llegada.getRotate());
+        //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
 
+        int elementoAleatorio = random.nextInt(listaLineasSalida.size());
+
+        instanciarAviones(listaLineasSalida.get(elementoAleatorio),elementoAleatorio);
+
+    }
+
+    private void instanciarAviones(Avion avion){
+
+        //Comprueba si el nodo tiene al menos 1 vertice saliendo de él
+        if (listaLineasSalida.size() == 0){
+            return;
+        }
+
+        //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
+
+        int elementoAleatorio = random.nextInt(listaLineasSalida.size());
+
+        instanciarAviones(listaLineasSalida.get(elementoAleatorio),elementoAleatorio,avion);
+
+    }
+
+    private void instanciarAviones(LineaArista lineaArista,int indiceRandom){
+
+        double inicioX = listaLineasSalida.get(indiceRandom).getStartX();
+        double inicioY = listaLineasSalida.get(indiceRandom).getStartY();
+        double finX = listaLineasSalida.get(indiceRandom).getEndX();
+        double finY = listaLineasSalida.get(indiceRandom).getEndY();
+        double angulo = listaLineasSalida.get(indiceRandom).obtenerAngulo();
+        LineaArista lineaAvion = listaLineasSalida.get(indiceRandom);
+
+        //Path para controlar el desplazamiento del avión por la línea
+        Path path = new Path();
+
+        //Agregar puntos de inicio
+        path.getElements().add(new MoveTo(lineaArista.getStartX(),lineaArista.getStartY()));
+
+        //Agregar puntos de llegada
+        path.getElements().add(new LineTo(lineaArista.getEndX(), lineaArista.getEndY()));
+
+        Avion avion = new Avion();
+
+        avion.setInicioX(inicioX);
+        avion.setInicioY(inicioY);
+        avion.setFinX(finX);
+        avion.setFinY(finY);
+        avion.setRotate(angulo);
+        avion.calcularDistancia(inicioX,inicioY,finX,finY);
+        avion.setPath(path);
+        avion.setLineaLocal(lineaAvion);
+
+        //Guardar el avion en la lista global
+        listaAviones.add(avion);
+
+        //Darle un Pane
+        avion.setPane(pane);
+
+        //Coords de spawn del avion
+        avion.setX(listaLineasSalida.get(indiceRandom).getStartX());
+        avion.setY(listaLineasSalida.get(indiceRandom).getStartY());
+        avion.setHashMap(this.hashMap);
+
+        avion.moverAvion();
+
+        //Añado el avión al Pane
         Platform.runLater(() -> {
             pane.getChildren().add(avion);
         });
 
-        /*while (cont > 0){
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    }
 
-            Random random = new Random();
+    private void instanciarAviones(LineaArista lineaArista,int indiceRandom,Avion avion){
 
-            int numRandom = random.nextInt(3);
+        double inicioX = listaLineasSalida.get(indiceRandom).getStartX();
+        double inicioY = listaLineasSalida.get(indiceRandom).getStartY();
+        double finX = listaLineasSalida.get(indiceRandom).getEndX();
+        double finY = listaLineasSalida.get(indiceRandom).getEndY();
+        double angulo = listaLineasSalida.get(indiceRandom).obtenerAngulo();
+        LineaArista lineaAvion = listaLineasSalida.get(indiceRandom);
 
+        //Path para controlar el desplazamiento del avión por la línea
+        Path path = new Path();
 
-            if (numRandom == 1){
+        //Agregar puntos de inicio
+        path.getElements().add(new MoveTo(lineaArista.getStartX(),lineaArista.getStartY()));
 
-                Avion avion = new Avion();
-                avion.setX(getX());
-                avion.setY(getY());
+        //Agregar puntos de llegada
+        path.getElements().add(new LineTo(lineaArista.getEndX(), lineaArista.getEndY()));
 
-                Platform.runLater(() -> {
+        avion.setInicioX(inicioX);
+        avion.setInicioY(inicioY);
+        avion.setFinX(finX);
+        avion.setFinY(finY);
+        avion.setRotate(angulo);
+        avion.calcularDistancia(inicioX,inicioY,finX,finY);
+        avion.setPath(path);
+        avion.setLineaLocal(lineaAvion);
 
-                    pane.getChildren().add(avion);
+        //Guardar el avion en la lista global
+        listaAviones.add(avion);
 
-                });
+        //Darle un pane
+        avion.setPane(pane);
 
+        //Coords de spawn del avion
+        avion.setX(listaLineasSalida.get(indiceRandom).getStartX());
+        avion.setY(listaLineasSalida.get(indiceRandom).getStartY());
+        avion.setHashMap(this.hashMap);
 
+        avion.moverAvion();
 
-            }
+    }
 
-            cont--;
+    public int solicitarRecarga(){
 
-        }*/
+        //Si el cumbustible es igual o mayor a la ración, darle el combustible, si no, no
+        if (combustible >= racionar){
+            int x = combustible;
+            combustible -= racionar;
+            return x;
+        }else {
+            return 0;
+        }
+
+    }
+
+    private void recargarCombustiblePortaavion(int recarga){
+
+        if (combustible + recarga >= 100){
+            combustible = 100;
+        }else {
+            combustible += recarga;
+        }
 
     }
 
 
-    @Override
-    public void run(){
-        //instanciarAviones();
+    public void generarAvionHangar(){
+
+        int numRandom = random.nextInt(3);
+
+        if (numRandom == 0){
+            Avion avion = hangar.get(0);
+
+            instanciarAviones(avion);
+            hangar.remove(0);
+
+
+        }
 
     }
 
+    private int racionarCombustible(){
 
-    public double getFinLinea_X() {
-        return linea_salida.getEndX();
-    }
+        int min = 3, max = 5;
 
-    public double getFinLinea_Y(){
-        return linea_salida.getEndY();
-    }
+        int x = random.nextInt(max - min + 1) + min;
 
-    public double getComienzoLinea_X() {
-        return linea_salida.getStartX();
-    }
+        return combustible / x;
 
-    public double getComienzoLinea_Y() {
-        return linea_salida.getStartY();
-    }
-
-    public LineaArista getLinea_salida(){
-        return linea_salida;
-    }
-
-    public void setLinea_llegada(LineaArista linea_llegada) {
-        this.linea_llegada = linea_llegada;
     }
 
     public void setLinea_salida(LineaArista linea_salida) {
-        this.linea_salida = linea_salida;
+        listaLineasSalida.add(linea_salida);
+    }
+
+    public void setLinea_llegada(LineaArista linea_llegada){
+        listaLineasLlegada.add(linea_llegada);
     }
 
     public String getLabelText() {
@@ -159,11 +259,57 @@ public class Portaaviones extends Rectangle implements Runnable{
         label.setText(this.labelText);
     }
 
-    public Pane getPane() {
-        return pane;
-    }
-
     public void setPane(Pane pane) {
         this.pane = pane;
+    }
+
+    public double getCombustible() {
+        return combustible;
+    }
+
+    //Agregar un avión al portaaviones
+    public boolean almacenarAvion(Avion avion){
+        if (hangar.size() < limiteAviones) {
+            hangar.add(avion);
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public int hangarSize(){
+
+        return hangar.size();
+
+    }
+
+    public ArrayList<LineaArista> getListaLineasSalida() {
+        return listaLineasSalida;
+    }
+
+    public HashMap<LineaArista, Object> getHashMap() {
+        return hashMap;
+    }
+
+    public void setHashMap(HashMap<LineaArista, Object> hashMap) {
+        this.hashMap = hashMap;
+    }
+
+    public void setTimeline(Timeline timeline) {
+        this.timeline = timeline;
+    }
+
+    @Override
+    public String toString(){
+        return "PortaAvión";
+    }
+
+    public void setListaAviones(ArrayList<Avion> listaAviones) {
+        this.listaAviones = listaAviones;
+    }
+
+    public void llenarTanquePortaavion(){
+        recargarCombustiblePortaavion(recarga_por_segundo);
     }
 }
