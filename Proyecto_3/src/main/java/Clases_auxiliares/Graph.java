@@ -2,11 +2,13 @@ package Clases_auxiliares;
 
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Graph {
     public int[][] mat;
     public boolean[][] matB;
-    public int size, edgeNum;
+    public int size, edgeNum, defWeight;
 
 
     public Graph(int num,int edges){//generates a graph
@@ -91,6 +93,7 @@ public class Graph {
         mat[j][i]=w;
         matB[i][j]=true;
         matB[j][i]=true;
+        defWeight = w; // stores the original weight
     }
     public boolean connected(){
         boolean[] columns=new boolean[size];
@@ -123,5 +126,33 @@ public class Graph {
                 return false;
         }
         return true;
+    }
+    public void increaseWeight(int i, int j, int increment) {
+        if (matB[i][j]) {
+            mat[i][j] += increment;
+            mat[j][i] += increment;
+        }
+    }
+    public void decrementWeightPeriodically(final int i, final int j) {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (defWeight <= 0) {
+                    timer.cancel();
+                    timer.purge();
+                    return;
+                }
+                decreaseWeightByOne(i, j);
+                defWeight--;
+            }
+        }, 5000, 5000);
+    }
+
+    private void decreaseWeightByOne(int i, int j) {
+        if (matB[i][j] && mat[i][j] > defWeight) {
+            mat[i][j]--;
+            mat[j][i]--;
+        }
     }
 }

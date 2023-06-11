@@ -2,6 +2,7 @@
   <library name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.12.1">
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.12.1/jackson-annotations-2.12.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Proyecto_3/arduinoController/jSerialComm-2.9.3.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-annotations/2.12.1/jackson-annotations-2.12.1-javadoc.jar!/" />
