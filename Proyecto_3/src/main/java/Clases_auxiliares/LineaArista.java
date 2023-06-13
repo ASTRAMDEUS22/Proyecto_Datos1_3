@@ -5,7 +5,9 @@ import javafx.scene.shape.Line;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-
+/**
+ * Clase que representa una línea de arista en un grafo.
+ */
 public class LineaArista extends Line implements Serializable {
 
     ArrayList<Avion> listaAviones = new ArrayList<>();
@@ -16,13 +18,21 @@ public class LineaArista extends Line implements Serializable {
     //Valor extra dado si se conectan mínimo a 1 portaavión
     private static final double pesoXPorta = 1.25,pesoXMar = 1.50;
 
-
+    /**
+     * Constructor de la clase LineaArista.
+     */
     public LineaArista(){
 
         setOpacity(0.4);
 
     }
-
+    /**
+     * Genera una línea de arista entre dos portaaviones.
+     *
+     * @param portaavionInicio  El portaavión de inicio.
+     * @param portaavioneFinal  El portaavión de destino.
+     * @return La línea de arista generada.
+     */
     //Si son dos portaaviones
     public LineaArista generarLinea(Portaaviones portaavionInicio, Portaaviones portaavioneFinal){
         //Linea
@@ -58,7 +68,13 @@ public class LineaArista extends Line implements Serializable {
         return this;
 
     }
-
+    /**
+     * Genera una línea de arista entre dos aeropuertos.
+     *
+     * @param aeropuertoInicio  El aeropuerto de inicio.
+     * @param aeropuertoFinal   El aeropuerto de destino.
+     * @return La línea de arista generada.
+     */
     //Si son dos aeropuertos
     public LineaArista generarLinea(Aeropuerto aeropuertoInicio, Aeropuerto aeropuertoFinal){
         //Linea
@@ -95,7 +111,13 @@ public class LineaArista extends Line implements Serializable {
         return this;
 
     }
-
+    /**
+     * Genera una línea de arista entre un aeropuerto y un portaavión.
+     *
+     * @param aeropuertoInicio      El aeropuerto de inicio.
+     * @param portaavionesFinal     El portaavión de destino.
+     * @return La línea de arista generada.
+     */
     //Si el inicio es aeropuerto y el destino es portaaviones
     public LineaArista generarLinea(Aeropuerto aeropuertoInicio, Portaaviones portaavionesFinal){
         //Linea
@@ -131,7 +153,13 @@ public class LineaArista extends Line implements Serializable {
         return this;
 
     }
-
+    /**
+     * Genera una línea de arista entre un portaavión y un aeropuerto.
+     *
+     * @param portaavionesInicio    El portaavión de inicio.
+     * @param aeropuertoFinal       El aeropuerto de destino.
+     * @return La línea de arista generada.
+     */
     //Si el inicio es portaaviones y el destino es aeropuerto
     public LineaArista generarLinea(Portaaviones portaavionesInicio, Aeropuerto aeropuertoFinal){
         //Linea
@@ -167,7 +195,13 @@ public class LineaArista extends Line implements Serializable {
         return this;
 
     }
-
+    /**
+     * Calcula el peso de la ruta en función de la distancia y los tipos de nodos.
+     *
+     * @param distancia      La distancia entre el punto de inicio y llegada.
+     * @param portaavion1    Indica si el primer nodo es un portaavión.
+     * @param portaavion2    Indica si el segundo nodo es un portaavión.
+     */
     //Calcular peso de la ruta
     private void calcularPesoRuta(int distancia,boolean portaavion1,boolean portaavion2){
 
@@ -263,7 +297,11 @@ public class LineaArista extends Line implements Serializable {
 
 
     }
-
+    /**
+     * Obtiene el ángulo de la línea de arista.
+     *
+     * @return El ángulo de la línea de arista en grados.
+     */
     public double obtenerAngulo(){
 
         //Diferencias entre coordenadas

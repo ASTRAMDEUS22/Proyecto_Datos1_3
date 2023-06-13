@@ -1,34 +1,57 @@
 package Clases_auxiliares;
 
-import java.util.ArrayList;
-
+/**
+ * Representa un paso en el algoritmo de Dijkstra para encontrar el camino más corto en un grafo.
+ */
 public class Traverse {
 
-    public class Node{
-        int from,weight;
-        boolean visited,origin;
+    /**
+     * Clase interna que representa un nodo en el paso del algoritmo.
+     */
+    public class Node {
+        int from;       // Nodo de origen
+        int weight;     // Peso acumulado
+        boolean visited;    // Indica si el nodo ha sido visitado
+        boolean origin;     // Indica si el nodo es el nodo de origen
 
-        public Node(){
+        /**
+         * Constructor de la clase Node.
+         */
+        public Node() {
             from = 0;
-            weight=Integer.MAX_VALUE;
-            visited=false;
-            origin=false;
+            weight = Integer.MAX_VALUE;
+            visited = false;
+            origin = false;
         }
     }
 
-    public Node[] nodes;
-    public int currN,currW,nextN,nextW;
-    public Traverse(int n){
-        nodes=new Node[n];
-        for(int i=0;i<nodes.length;i++){
-            nodes[i]=new Node();
+    public Node[] nodes;    // Array de nodos
+    public int currN;       // Nodo actual
+    public int currW;       // Peso acumulado actual
+    public int nextN;       // Siguiente nodo a visitar
+    public int nextW;       // Peso acumulado del siguiente nodo
+
+    /**
+     * Constructor de la clase Traverse.
+     *
+     * @param n El tamaño del array de nodos.
+     */
+    public Traverse(int n) {
+        nodes = new Node[n];
+        for (int i = 0; i < nodes.length; i++) {
+            nodes[i] = new Node();
         }
     }
-    public void printStep(){
-        System.out.print((currN+1)+"\t");
-        for(int i=0;i<nodes.length;i++){
-            System.out.print(((nodes[i].weight==Integer.MAX_VALUE)?"X":nodes[i].weight)+"\t");
+
+    /**
+     * Imprime un paso del algoritmo de Dijkstra.
+     */
+    public void printStep() {
+        System.out.print((currN + 1) + "\t");
+        for (int i = 0; i < nodes.length; i++) {
+            System.out.print(((nodes[i].weight == Integer.MAX_VALUE) ? "X" : nodes[i].weight) + "\t");
         }
         System.out.println();
     }
 }
+

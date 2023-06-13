@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
+/**
+ * Esta clase proporciona un generador de nombres para aviones.
+ */
 public class GeneradorNombres {
 
+    /**
+     * Método principal que permite al usuario generar nombres de aviones de forma interactiva.
+     * Los nombres generados se almacenan en una lista y se imprimen al final.
+     */
     public static void main(String[] args) {
         List<String> nombres = new ArrayList<>();
         Scanner scanner = new Scanner(System.in);
@@ -37,6 +39,11 @@ public class GeneradorNombres {
         }
     }
 
+    /**
+     * Genera un nombre de avión aleatorio utilizando una lista predefinida de nombres y añadiendo letras aleatorias y un número al final.
+     *
+     * @return el nombre generado para el avión
+     */
     private static String generarNombreAleatorio() {
         String[] listaNombres = {"Falcon", "Thunderbird", "Viper", "Eagle", "Raptor", "Phoenix", "Hawk", "Valkyrie"};
         Random random = new Random();
@@ -55,6 +62,12 @@ public class GeneradorNombres {
         return nombreGenerado;
     }
 
+    /**
+     * Genera una cadena de letras aleatorias en mayúsculas.
+     *
+     * @param cantidad la cantidad de letras a generar
+     * @return la cadena de letras generada
+     */
     private static String generarLetrasAleatorias(int cantidad) {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();

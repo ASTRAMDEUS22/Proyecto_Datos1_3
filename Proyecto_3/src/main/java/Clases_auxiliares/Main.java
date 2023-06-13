@@ -4,7 +4,9 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
+import java.util.LinkedList;
 import java.util.Scanner;
+
 public class Main {
     private static SerialPort serialPort;
     private static int counter;
