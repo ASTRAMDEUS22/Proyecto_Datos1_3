@@ -10,8 +10,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,7 +39,7 @@ AirWar extends Application implements Runnable{
     Random random = new Random();
 
     //Ints
-    final static int minAlto = 1,maxAlto = 627,minAncho = 1,maxAncho = 1356,maxPorta = 8,minPorta = 4,minAero = 5,
+    final static int minAlto = 75,maxAlto = 552,minAncho = 75,maxAncho = 1281,maxPorta = 8,minPorta = 4,minAero = 5,
             maxAero = 12;
 
     //Conexion con el servidor
@@ -49,18 +47,18 @@ AirWar extends Application implements Runnable{
     final static int localport = 4444,serverPort = 2222;
 
     //Socket servidor
-    ServerSocket serverSocket;
+    private ServerSocket serverSocket;
 
     //Hashmap para conectar una línea y un portaavion
-    HashMap<LineaArista, Object> mapaDestinos = new HashMap<>();
+    private HashMap<LineaArista, Object> mapaDestinos = new HashMap<>();
 
 
     //Lista de aviones
-    ArrayList<Avion> listaAviones = new ArrayList<>();
+    private static ArrayList<Avion> listaAviones = new ArrayList<>();
 
     //Generar contador de tiempo general
     Temporizador temporizador = new Temporizador(
-            listaAviones,
+            //listaAviones,
             listaPortaaviones,
             listaAeropuertos
     );
@@ -77,6 +75,7 @@ AirWar extends Application implements Runnable{
         Thread thread = new Thread(this);
         thread.start();
 
+
     }
 
 
@@ -92,15 +91,37 @@ AirWar extends Application implements Runnable{
         imageView.setImage(image);
         pane.getChildren().add(imageView);
 
+
         int barcos_generados = generarPortaRandom(),aeropuertos_generados = generarAeroRandom();
 
         PixelReader pixelReader = image.getPixelReader();
+
+        //Genera los portaaviones en el mapa
+        generarPortaaviones(barcos_generados,pixelReader);
+
+        //Genera los aeropuertos en el mapa
+        generarAeropuertos(aeropuertos_generados,pixelReader);
+
+        //Crea las líneas que conectan los nodos del grafo
+        crearAristas();
+
+        //Genera los primeros aviones
+        generarAviones();
+
+        Scene scene = new Scene(pane,maxAncho + 1,maxAlto + 1);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
+    }
+
+    public void generarPortaaviones(int aeropuertos_generados,PixelReader pixelReader){
 
         //Índice para identificar los barcos
         int i = 0;
 
         //Generar barcos
-        while (barcos_generados != 0){
+        while (aeropuertos_generados != 0){
 
             int x = generarCoordsRandomX();
             int y = generarCoordsRandomY();
@@ -121,21 +142,21 @@ AirWar extends Application implements Runnable{
                 pane.getChildren().add(portaaviones);
                 listaPortaaviones.add(portaaviones);
 
-                //Pasarle la lista global de aviones
-                portaaviones.setListaAviones(listaAviones);
-
                 portaaviones.setLabelText(String.valueOf(i));
                 portaaviones.crearLabel();
 
-                barcos_generados--;
+                aeropuertos_generados--;
                 i++;
 
             }
 
         }
 
-        //Reiniciar el índice
-        i = 0;
+    }
+
+    public void generarAeropuertos(int aeropuertos_generados,PixelReader pixelReader){
+
+        int i = 0;
 
         //Generar aeropuertos
         while (aeropuertos_generados > 0){
@@ -158,9 +179,6 @@ AirWar extends Application implements Runnable{
                 aeropuerto.setY(y);
                 aeropuerto.setPane(pane);
 
-                //Pasarle la lista global de aviones
-                aeropuerto.setListaAviones(listaAviones);
-
                 pane.getChildren().addAll(aeropuerto);
                 listaAeropuertos.add(aeropuerto);
 
@@ -174,14 +192,6 @@ AirWar extends Application implements Runnable{
             }
 
         }
-
-        crearAristas();
-        generarAviones();
-
-        Scene scene = new Scene(pane,maxAncho + 1,maxAlto + 1);
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
 
     }
 
@@ -279,6 +289,20 @@ AirWar extends Application implements Runnable{
         }
     }
 
+    public static void agregarElementoListaAvion(Avion avion){
+        System.out.println("Se añade un avión");
+        listaAviones.add(avion);
+    }
+
+    public static ArrayList<Avion> obtenerListaAviones(){
+        return listaAviones;
+    }
+
+    public static void eliminarElementoListaAviones(Avion avion){
+        System.out.println("Se elimina un avion");
+        listaAviones.remove(avion);
+    }
+
     private int generarCoordsRandomX(){
         return random.nextInt(maxAncho - minAncho + 1) + minAncho;
     }
@@ -357,44 +381,59 @@ AirWar extends Application implements Runnable{
 
     public void generarAviones(){
 
-        Mensaje mensaje = new Mensaje("listaPortaaviones");
+        Mensaje mensaje1 = new Mensaje("listaPortaaviones");
 
-        ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+        ArrayList<Mensaje> listaMensajes1 = new ArrayList<>();
 
         for (Portaaviones portaaviones: listaPortaaviones){
 
-            Mensaje mensaje1 = new Mensaje();
+            Mensaje mensaje = new Mensaje();
 
             portaaviones.setHashMap(mapaDestinos);
 
             portaaviones.instanciarAviones();
 
             //Obtener el índice del portaavion en la lista
-            mensaje1.setI(Integer.parseInt(portaaviones.getLabelText()));
+            mensaje.setI(Integer.parseInt(portaaviones.getLabelText()));
 
-            listaMensajes.add(mensaje1);
+            listaMensajes1.add(mensaje);
 
         }
 
+        Mensaje mensaje2 = new Mensaje("listaAeropuertos");
+
+        ArrayList<Mensaje> listaMensajes2 = new ArrayList<>();
+
         for (Aeropuerto aeropuerto : listaAeropuertos){
+
+            Mensaje mensaje = new Mensaje();
 
             aeropuerto.setHashMap(mapaDestinos);
             aeropuerto.instanciarAviones();
 
+            //Obtener el índice del portaavion en la lista
+            mensaje.setI(Integer.parseInt(aeropuerto.getLabelText()));
+
+            listaMensajes2.add(mensaje);
+
         }
 
-        //System.out.println(mapaDestinos.size());
+        mensaje1.setListaMensajes(listaMensajes1);
+        enviarMensajeServidor(mensaje1);
 
-        mensaje.setListaMensajes(listaMensajes);
-
-        enviarMensajeServidor(mensaje);
+        mensaje2.setListaMensajes(listaMensajes2);
+        enviarMensajeServidor(mensaje2);
 
     }
 
-    public void crearAvion(int i){
+    public void crearAvionPorta(int i){
 
         listaPortaaviones.get(i).instanciarAviones();
 
+    }
+
+    private void crearAvionAero(int i){
+        listaAeropuertos.get(i).instanciarAviones();
     }
 
     public void enviarMensajeServidor(Mensaje mensaje){
@@ -435,10 +474,13 @@ AirWar extends Application implements Runnable{
 
                 switch (mensaje.getAccion()){
 
-                    case "crearAvion" -> {
+                    case "crearAvionPorta" -> {
 
-                        crearAvion(mensaje.getI());
+                        crearAvionPorta(mensaje.getI());
 
+                    }
+                    case "crearAvionAero" -> {
+                        crearAvionAero(mensaje.getI());
                     }
 
                 }

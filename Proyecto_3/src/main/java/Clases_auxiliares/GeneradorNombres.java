@@ -12,53 +12,66 @@ import java.util.Scanner;
 
 public class GeneradorNombres {
 
-    public static void main(String[] args) {
-        List<String> nombres = new ArrayList<>();
-        Scanner scanner = new Scanner(System.in);
-        Random random = new Random();
+    private static final Random random = new Random();
+    private static final List<String> nombres = new ArrayList<>();
 
-        boolean generarMasNombres = true;
-        while (generarMasNombres) {
-            String nombreGenerado = generarNombreAleatorio();
-            nombres.add(nombreGenerado);
+    public static String generarNombre() {
 
-            System.out.println("Nombre de avion generado: " + nombreGenerado);
-            System.out.print("¿Desea generar otro nombre de avion? (s/n): ");
-            String respuesta = scanner.nextLine();
+        String nombreGenerado;
 
-            if (!respuesta.equalsIgnoreCase("s")) {
-                generarMasNombres = false;
+
+        //Bucle para no generar dos nombres iguales
+        while (true){
+
+            nombreGenerado = generarNombreAleatorio();
+            boolean existe = false;
+
+            for (String nombre : nombres) {
+
+                if (nombre.equals(nombreGenerado)) {
+                    existe = true;
+                    break;
+                }
+
             }
+
+            if (!existe){
+                break;
+            }
+
         }
 
-        System.out.println("Lista de nombres de aviones generados:");
+        nombres.add(nombreGenerado);
+
+        //System.out.println("Nombre de avion generado: " + nombreGenerado);
+
+        /*System.out.println("Lista de nombres de aviones generados:");
         for (String nombre : nombres) {
             System.out.println(nombre);
-        }
+        }*/
+        return nombreGenerado;
     }
 
     private static String generarNombreAleatorio() {
         String[] listaNombres = {"Falcon", "Thunderbird", "Viper", "Eagle", "Raptor", "Phoenix", "Hawk", "Valkyrie"};
-        Random random = new Random();
+
         int indiceAleatorio = random.nextInt(listaNombres.length);
         String nombreAvion = listaNombres[indiceAleatorio];
 
         // Generar tres letras aleatorias
-        String letrasAleatorias = generarLetrasAleatorias(3);
+        String letrasAleatorias = generarLetrasAleatorias();
 
         // Generar un número aleatorio entre 100 y 999
         int numeroAleatorio = random.nextInt(900) + 100;
 
         // Concatenar las letras aleatorias y el número aleatorio al final del nombre del avión
-        String nombreGenerado = nombreAvion + "-" + letrasAleatorias + numeroAleatorio;
-
-        return nombreGenerado;
+        return nombreAvion + "-" + letrasAleatorias + numeroAleatorio;
     }
 
-    private static String generarLetrasAleatorias(int cantidad) {
+    private static String generarLetrasAleatorias() {
         StringBuilder sb = new StringBuilder();
         Random random = new Random();
-        for (int i = 0; i < cantidad; i++) {
+        for (int i = 0; i < 3; i++) {
             // Generar una letra aleatoria (mayúscula)
             char letra = (char) (random.nextInt(26) + 'A');
             sb.append(letra);

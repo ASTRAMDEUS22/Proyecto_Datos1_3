@@ -17,10 +17,24 @@ public class Mensaje implements Serializable {
     private int hangar;
 
     //Combustible de la plataforma
-    private int combustible;
+    private int combustiblePlataforma;
 
     //Lista de mensajes
-    ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+    private ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+
+    //Sector de aviones
+    private String nombreAvion;
+    private boolean recargandoCombusible;
+    private int combustibleAvion;
+    private int fortaleza;
+    private int eficiencia;
+    private int velocidad;
+    private double distancia;
+
+
+
+    //Avion
+    private Avion avion;
 
     public Mensaje(){
 
@@ -54,12 +68,12 @@ public class Mensaje implements Serializable {
         this.hangar = hangar;
     }
 
-    public int getCombustible() {
-        return combustible;
+    public int getCombustiblePlataforma() {
+        return combustiblePlataforma;
     }
 
-    public void setCombustible(int combustible) {
-        this.combustible = combustible;
+    public void setCombustiblePlataforma(int combustiblePlataforma) {
+        this.combustiblePlataforma = combustiblePlataforma;
     }
 
     public ArrayList<Mensaje> getListaMensajes() {
@@ -68,6 +82,82 @@ public class Mensaje implements Serializable {
 
     public void setListaMensajes(ArrayList<Mensaje> listaMensajes) {
         this.listaMensajes = listaMensajes;
+    }
+
+    public Avion getAvion() {
+        return avion;
+    }
+
+    public void setAvion(Avion avion) {
+        this.avion = avion;
+    }
+
+    public String getNombreAvion() {
+        return nombreAvion;
+    }
+
+    public void setNombreAvion(String nombreAvion) {
+        this.nombreAvion = nombreAvion;
+    }
+
+    public boolean isRecargandoCombustible() {
+        return recargandoCombusible;
+    }
+
+    public void setRecargandoCombustible(boolean recargandoCombusible) {
+        this.recargandoCombusible = recargandoCombusible;
+    }
+
+    public int getCombustibleAvion() {
+        return combustibleAvion;
+    }
+
+    public void setCombustibleAvion(int combustibleAvion) {
+        this.combustibleAvion = combustibleAvion;
+    }
+
+    public int getFortaleza() {
+        return fortaleza;
+    }
+
+    public void setFortaleza(int fortaleza) {
+        this.fortaleza = fortaleza;
+    }
+
+    public int getEficiencia() {
+        return eficiencia;
+    }
+
+    public void setEficiencia(int eficiencia) {
+        this.eficiencia = eficiencia;
+    }
+
+    public int getVelocidad() {
+        return velocidad;
+    }
+
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
+    }
+
+    public boolean isRecargandoCombusible() {
+        return recargandoCombusible;
+    }
+
+    public void setRecargandoCombusible(boolean recargandoCombusible) {
+        this.recargandoCombusible = recargandoCombusible;
+    }
+
+    public double getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(double distancia) {
+        this.distancia = distancia;
+    }
+
+    public Mensaje getMensaje(){
+        return this;
     }
 
     @Override

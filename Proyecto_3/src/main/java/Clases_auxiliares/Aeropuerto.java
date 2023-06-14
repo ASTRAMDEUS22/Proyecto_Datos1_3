@@ -1,5 +1,6 @@
 package Clases_auxiliares;
 
+import Juego.AirWar;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -9,7 +10,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
-import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Random;
 
 
-public class Aeropuerto extends Rectangle {
+public class Aeropuerto extends Portaaviones {
 
     //Imagen del aeropuerto
     Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Imagenes/aeropuerto.gif")));
@@ -28,6 +28,9 @@ public class Aeropuerto extends Rectangle {
     //Ancho y alto del objeto
     private int ancho = 30, alto = 30;
 
+    final static String host = "localhost";
+    final static int serverPort = 2222;
+
     //Pane
     private Pane pane;
 
@@ -37,7 +40,7 @@ public class Aeropuerto extends Rectangle {
     //Combustible
     private int combustible = 100;
     private final int racionar = racionarCombustible();
-    private final int recarga_por_segundo = 10;
+    private final int recarga_por_segundo = 4;
 
     //Punto de llegada
     private ArrayList<LineaArista> listaLineasLlegada = new ArrayList<>();
@@ -47,8 +50,6 @@ public class Aeropuerto extends Rectangle {
     //Mapa de líneas con Portaaviones y Aeropuertos
     private HashMap<LineaArista,Object> hashMap;
 
-    //Lista de aviones
-    private ArrayList<Avion> listaAviones;
     private final int limiteAviones = 5;
 
     //Instancia de un Timeline para manejar la generación de aviones cada n segundos
@@ -57,12 +58,13 @@ public class Aeropuerto extends Rectangle {
     //Label para ver el índice del aeropuerto
     private String labelText;
     private Label label = new Label();
+    private Label hangarSize = new Label();
+    private Label cantidadCombustible = new Label();
 
 
-
-
-
-
+    /**
+     * Constructor de la clase
+     */
     public Aeropuerto(){
 
         setWidth(ancho);  //Ancho
@@ -73,10 +75,13 @@ public class Aeropuerto extends Rectangle {
     }
 
 
-
+    /**
+     * Método que define que tanto combustible se le dará a cada avión que pase
+     * @return Cantidad que se va a racionar
+     */
     public int racionarCombustible(){
 
-        int min = 3,max = 5;
+        int min = 5,max = 7;
 
         int x = random.nextInt(max - min + 1) + min;
 
@@ -84,9 +89,15 @@ public class Aeropuerto extends Rectangle {
 
     }
 
+    /**
+     * Metodo que se usa para crear un avión y vaya por alguna de las aristas
+     */
     public void instanciarAviones(){
 
         //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
+        if (listaLineasSalida.size() == 0){
+            return;
+        }
 
         int elementoAleatorio = random.nextInt(listaLineasSalida.size());
 
@@ -94,12 +105,18 @@ public class Aeropuerto extends Rectangle {
 
     }
 
+    /**
+     * Hace despegar un avión en el hangar dandole una nueva ruta
+     * @param avion El primer avión que esta en el hangar
+     */
     private void instanciarAviones(Avion avion){
 
         //Comprueba si el nodo tiene al menos 1 vertice saliendo de él
         if (listaLineasSalida.size() == 0){
             return;
         }
+
+        avion.setVisible(true);
 
         //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
 
@@ -109,20 +126,44 @@ public class Aeropuerto extends Rectangle {
 
     }
 
+    /**
+     * Crea labels para proporcionar información del objeto
+     */
     public void crearLabel(){
 
-        label.setTranslateX(getX() + 25);
+        //Indice
+        label.setTranslateX(getX() + 35);
         label.setTranslateY(getY());
-
 
         label.setStyle("-fx-text-fill: #ffffff");
 
         label.setText(labelText);
 
-        pane.getChildren().add(label);
+        //Hangar
+        hangarSize.setTranslateX(getX() + 35);
+        hangarSize.setTranslateY(getY() + 35);
+
+        hangarSize.setStyle("-fx-text-fill: #ffffff");
+
+        hangarSize.setText("0");
+
+        //Combustible
+        cantidadCombustible.setTranslateX(getX() - 35);
+        cantidadCombustible.setTranslateY(getY());
+
+        cantidadCombustible.setStyle("-fx-text-fill: #ffffff");
+
+        cantidadCombustible.setText(String.valueOf(combustible));
+
+        pane.getChildren().addAll(label,hangarSize,cantidadCombustible);
 
     }
 
+    /**
+     * Crea un avión y lo envia por alguna línea de salida del portaavion
+     * @param lineaArista Línea aleatoria de las aristas de salida
+     * @param indiceRandom Indice random para elegir una linea
+     */
     private void instanciarAviones(LineaArista lineaArista,int indiceRandom){
 
         double inicioX = listaLineasSalida.get(indiceRandom).getStartX();
@@ -141,7 +182,7 @@ public class Aeropuerto extends Rectangle {
         //Agregar puntos de llegada
         path.getElements().add(new LineTo(lineaArista.getEndX(), lineaArista.getEndY()));
 
-        Avion avion = new Avion();
+        Avion avion = new Avion(GeneradorNombres.generarNombre());
 
         avion.setInicioX(inicioX);
         avion.setInicioY(inicioY);
@@ -153,7 +194,7 @@ public class Aeropuerto extends Rectangle {
         avion.setLineaLocal(lineaAvion);
 
         //Guardar el avion en la lista global
-        listaAviones.add(avion);
+        AirWar.agregarElementoListaAvion(avion);
 
         //Darle un pane
         avion.setPane(pane);
@@ -174,6 +215,12 @@ public class Aeropuerto extends Rectangle {
 
     }
 
+    /**
+     * Le asigna una nueva ruta y línea de salida a un avión
+     * @param lineaArista Línea aleatoria de las aristas de salida
+     * @param indiceRandom Indice random para elegir una linea
+     * @param avion El avión al cuál se le asignará una nueva ruta
+     */
     private void instanciarAviones(LineaArista lineaArista,int indiceRandom,Avion avion){
 
         double inicioX = listaLineasSalida.get(indiceRandom).getStartX();
@@ -201,9 +248,6 @@ public class Aeropuerto extends Rectangle {
         avion.setPath(path);
         avion.setLineaLocal(lineaAvion);
 
-        //Guardar el avion en la lista global
-        listaAviones.add(avion);
-
         //Darle un pane
         avion.setPane(pane);
 
@@ -227,6 +271,8 @@ public class Aeropuerto extends Rectangle {
             instanciarAviones(avion);
             hangar.remove(0);
 
+            hangarSize.setText(String.valueOf(hangar.size()));
+
 
         }
 
@@ -235,7 +281,29 @@ public class Aeropuerto extends Rectangle {
     public int solicitarRecarga(){
 
         if (combustible >= racionar){
-            return combustible;
+
+            int x;
+
+            //Si el resultado es menor a cero, vamos a conservar la diferencia positiva
+            if ((combustible - racionar) < 0){
+                x = racionar - combustible;
+            }
+            else if ((combustible - racionar) > 0){
+                x = combustible - racionar;
+            }
+            else {
+                x = 0;
+            }
+
+            //int x = combustible -= racionar;
+            //combustible -= racionar;
+
+            combustible = x;
+
+
+            cantidadCombustible.setText(String.valueOf(x));
+
+            return x;
         }else {
             return 0;
         }
@@ -249,6 +317,22 @@ public class Aeropuerto extends Rectangle {
         }else {
             combustible += recarga;
         }
+
+        cantidadCombustible.setText(String.valueOf(combustible));
+
+    }
+
+
+    //Agregar un avión al portaaviones
+    public boolean almacenarAvion(Avion avion){
+        if (hangar.size() < limiteAviones) {
+            hangar.add(avion);
+            //avion.setVisible(false);
+            hangarSize.setText(String.valueOf(hangar.size()));
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -287,18 +371,11 @@ public class Aeropuerto extends Rectangle {
         label.setText(this.labelText);
     }
 
-    //Agregar un avión al portaaviones
-    public boolean almacenarAvion(Avion avion){
-        if (hangar.size() < limiteAviones) {
-            hangar.add(avion);
-            return true;
-        }
-
-        return false;
-
+    public String getLabelText(){
+        return labelText;
     }
 
-    public int getCombustible() {
+    public double getCombustible() {
         return combustible;
     }
 
@@ -320,18 +397,6 @@ public class Aeropuerto extends Rectangle {
 
     public void setHashMap(HashMap<LineaArista, Object> hashMap) {
         this.hashMap = hashMap;
-    }
-
-    public Timeline getTimeline() {
-        return timeline;
-    }
-
-    public void setTimeline(Timeline timeline) {
-        this.timeline = timeline;
-    }
-
-    public void setListaAviones(ArrayList<Avion> listaAviones) {
-        this.listaAviones = listaAviones;
     }
 
     public void llenarTanqueAeropuerto(){

@@ -19,7 +19,14 @@ public class LineaArista extends Line implements Serializable {
 
     public LineaArista(){
 
-        setOpacity(0.4);
+        setOpacity(0.2);
+        setStrokeWidth(2);
+
+        setOnMouseClicked(event -> {
+
+            System.out.println("Peso ruta: " + this.pesoRuta);
+
+        });
 
     }
 

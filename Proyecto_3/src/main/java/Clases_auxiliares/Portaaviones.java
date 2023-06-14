@@ -1,5 +1,6 @@
 package Clases_auxiliares;
 
+import Juego.AirWar;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -17,38 +18,34 @@ import java.util.Random;
 
 public class Portaaviones extends Rectangle implements Serializable {
 
-    //Imagen del aeropuerto
-    private Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Imagenes/portaAviones.png")));
-
 
     private Random random = new Random();
 
     private Pane pane;
 
     //Label para saber cuál portaavión de la lista es
-    private Label label = new Label();
+    private final Label label = new Label();
+    private final Label hangarSize = new Label();
+    private final Label cantidadCombustible = new Label();
 
     //Texto del label
     private String labelText;
 
     //Lista de líneas
-    private ArrayList<LineaArista> listaLineasSalida = new ArrayList<>();
-    private ArrayList<LineaArista> listaLineasLlegada = new ArrayList<>();
+    private final ArrayList<LineaArista> listaLineasSalida = new ArrayList<>();
+    private final ArrayList<LineaArista> listaLineasLlegada = new ArrayList<>();
 
     //Mapa de líneas con Portaaviones y Aeropuertos
     private HashMap<LineaArista,Object> hashMap;
 
     //Hangar que delimita el máximo de aviones en el portaavion
-    private ArrayList<Avion> hangar = new ArrayList<>();
+    private final ArrayList<Avion> hangar = new ArrayList<>();
     private final int limiteAviones = 5;
-
-    private ArrayList<Avion> listaAviones;
 
     //Combustible total del Portaavion
     private int combustible = 100;
-    private final int recarga_por_segundo = 10;
+    private final int recarga_por_segundo = 4;
     private final int racionar = racionarCombustible();
-
 
     //Instancia de un Timeline para manejar la generación de aviones cada n segundos
     private Timeline timeline;
@@ -58,30 +55,50 @@ public class Portaaviones extends Rectangle implements Serializable {
         setWidth(22);  //Ancho del objeto
         setHeight(40);  //Alto del objeto
 
+        //Imagen del aeropuerto
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/Imagenes/portaAviones.png")));
         setFill(new ImagePattern(image));
 
     }
 
     public void crearLabel(){
 
+        //Indice
         label.setTranslateX(getX() + 25);
         label.setTranslateY(getY());
-
 
         label.setStyle("-fx-text-fill: #ffffff");
 
         label.setText(labelText);
 
-        pane.getChildren().add(label);
+        //Hangar
+        hangarSize.setTranslateX(getX() + 25);
+        hangarSize.setTranslateY(getY() + 25);
+
+        hangarSize.setStyle("-fx-text-fill: #ffffff");
+
+        hangarSize.setText("0");
+
+        //Combustible
+        cantidadCombustible.setTranslateX(getX() - 35);
+        cantidadCombustible.setTranslateY(getY());
+
+        cantidadCombustible.setStyle("-fx-text-fill: #ffffff");
+
+        cantidadCombustible.setText(String.valueOf(combustible));
+
+        pane.getChildren().addAll(label,hangarSize,cantidadCombustible);
 
     }
 
     public void instanciarAviones(){
 
         //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
+        if (listaLineasSalida.size() == 0) {
+            return;
+        }
 
         int elementoAleatorio = random.nextInt(listaLineasSalida.size());
-
         instanciarAviones(listaLineasSalida.get(elementoAleatorio),elementoAleatorio);
 
     }
@@ -92,6 +109,8 @@ public class Portaaviones extends Rectangle implements Serializable {
         if (listaLineasSalida.size() == 0){
             return;
         }
+
+        avion.setVisible(true);
 
         //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
 
@@ -119,7 +138,7 @@ public class Portaaviones extends Rectangle implements Serializable {
         //Agregar puntos de llegada
         path.getElements().add(new LineTo(lineaArista.getEndX(), lineaArista.getEndY()));
 
-        Avion avion = new Avion();
+        Avion avion = new Avion(GeneradorNombres.generarNombre());
 
         avion.setInicioX(inicioX);
         avion.setInicioY(inicioY);
@@ -131,7 +150,8 @@ public class Portaaviones extends Rectangle implements Serializable {
         avion.setLineaLocal(lineaAvion);
 
         //Guardar el avion en la lista global
-        listaAviones.add(avion);
+        //listaAviones.add(avion);
+        AirWar.agregarElementoListaAvion(avion);
 
         //Darle un Pane
         avion.setPane(pane);
@@ -178,9 +198,6 @@ public class Portaaviones extends Rectangle implements Serializable {
         avion.setPath(path);
         avion.setLineaLocal(lineaAvion);
 
-        //Guardar el avion en la lista global
-        listaAviones.add(avion);
-
         //Darle un pane
         avion.setPane(pane);
 
@@ -197,11 +214,33 @@ public class Portaaviones extends Rectangle implements Serializable {
 
         //Si el cumbustible es igual o mayor a la ración, darle el combustible, si no, no
         if (combustible >= racionar){
-            int x = combustible;
-            combustible -= racionar;
+
+            int x;
+
+            //Si el resultado es menor a cero, vamos a conservar la diferencia positiva
+            if ((combustible - racionar) < 0){
+                x = racionar - combustible;
+            }
+            else if ((combustible - racionar) > 0){
+                x = combustible - racionar;
+            }
+            else {
+                x = 0;
+            }
+
+            //int x = combustible -= racionar;
+            //combustible -= racionar;
+
+            combustible = x;
+
+
+            cantidadCombustible.setText(String.valueOf(x));
+
             return x;
         }else {
+
             return 0;
+
         }
 
     }
@@ -214,6 +253,8 @@ public class Portaaviones extends Rectangle implements Serializable {
             combustible += recarga;
         }
 
+        cantidadCombustible.setText(String.valueOf(combustible));
+
     }
 
 
@@ -224,8 +265,12 @@ public class Portaaviones extends Rectangle implements Serializable {
         if (numRandom == 0){
             Avion avion = hangar.get(0);
 
+            avion.setRecargando_combustible(false);
             instanciarAviones(avion);
+
             hangar.remove(0);
+
+            hangarSize.setText(String.valueOf(hangar.size()));
 
 
         }
@@ -234,7 +279,7 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     private int racionarCombustible(){
 
-        int min = 3, max = 5;
+        int min = 5, max = 7;
 
         int x = random.nextInt(max - min + 1) + min;
 
@@ -271,6 +316,8 @@ public class Portaaviones extends Rectangle implements Serializable {
     public boolean almacenarAvion(Avion avion){
         if (hangar.size() < limiteAviones) {
             hangar.add(avion);
+            //avion.setVisible(false);
+            hangarSize.setText(String.valueOf(hangar.size()));
             return true;
         }
 
@@ -296,17 +343,9 @@ public class Portaaviones extends Rectangle implements Serializable {
         this.hashMap = hashMap;
     }
 
-    public void setTimeline(Timeline timeline) {
-        this.timeline = timeline;
-    }
-
     @Override
     public String toString(){
         return "PortaAvión";
-    }
-
-    public void setListaAviones(ArrayList<Avion> listaAviones) {
-        this.listaAviones = listaAviones;
     }
 
     public void llenarTanquePortaavion(){

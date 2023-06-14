@@ -1,5 +1,6 @@
 package Clases_auxiliares;
 
+import Juego.AirWar;
 import javafx.animation.PathTransition;
 //import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -20,14 +21,13 @@ public class Avion extends Rectangle implements Serializable {
     private int velocidad = definirVelocidad();
 
     //Consumo de combstible por segundo
-    private int eficiencia = 10;
+    private int eficiencia = definirEficiencia();
 
     //Vida del avión ante los disparos
     private int fortaleza = 2;
 
     //Combustible total del avión
     private int combustible = 100;
-
 
     private double distancia;
 
@@ -42,16 +42,20 @@ public class Avion extends Rectangle implements Serializable {
     private Pane pane;
 
     private boolean recargando_combustible = false;
+    private boolean fue_recargado = false;
 
-    private Object zonaAterrizaje;
+    //Nombre del avion
+    private String nombre;
 
     //TranslateTransition transition;
     private PathTransition pathTransition = new PathTransition();
 
-    public Avion() {
+    public Avion(String nombre) {
 
         setWidth(10);  //Ancho del objeto
         setHeight(10);  //Alto del objeto
+
+        this.nombre = nombre;
 
         setStyle("-fx-fill: #c5bc0c");
 
@@ -71,6 +75,7 @@ public class Avion extends Rectangle implements Serializable {
         pathTransition.play();
 
         recargando_combustible = false;
+        fue_recargado = false;
 
         //Evento que detecta si el avión llega a su destino
         pathTransition.setOnFinished(event -> {
@@ -83,13 +88,19 @@ public class Avion extends Rectangle implements Serializable {
                 //Si no se puede almacenar más aviones siga reduciendo el combustible, si no, que recargue
                 if (temp.almacenarAvion(this)){
                     this.recargando_combustible = true;
+
+                    //Se solicita recarga de combustible
+                    if (!fue_recargado) {
+                        this.combustible = temp.solicitarRecarga();
+                        fue_recargado = true;
+                    }
+
+
                 }
 
-                //Indica que está en un nodo y procede a recargar combustible
-                //this.recargando_combustible = true;
 
-                //Se solicita recarga de combustible
-                this.combustible = temp.solicitarRecarga();
+
+
 
 
             }
@@ -99,16 +110,24 @@ public class Avion extends Rectangle implements Serializable {
                 //Si no se puede almacenar más aviones siga reduciendo el combustible, si no, que recargue
                 if (temp.almacenarAvion(this)){
                     this.recargando_combustible = true;
+
+                    if (!fue_recargado) {
+
+                        //Se solicita recarga de combustible
+                        this.combustible = temp.solicitarRecarga();
+                        fue_recargado = true;
+                    }
                 }
-
-                //System.out.println(recargando_combustible);
-
-                //Se solicita recarga de combustible
-                this.combustible = temp.solicitarRecarga();
 
             }
 
+            //Se detiene la animación
+            pathTransition.stop();
+
         });
+
+
+
 
 
     }
@@ -128,27 +147,38 @@ public class Avion extends Rectangle implements Serializable {
 
     }
 
-    public void destruirAvion(int i,ArrayList<Avion> listaAviones){
+    public int definirEficiencia(){
 
+        int maxEfi = 13, minEfi = 8;
+
+        return random.nextInt(maxEfi - minEfi + 1) + minEfi;
+
+    }
+
+    public void destruirAvion(){
+        //Detiene la transición y movimiento del avión
+        pathTransition.stop();
+
+        //Se remueve del contenedor
         pane.getChildren().remove(this);
-        listaAviones.remove(i);
+
+        //Se elimina de la lista general de aviones
+        AirWar.eliminarElementoListaAviones(this);
 
     }
 
-    public int getCombustible() {
-        return combustible;
-    }
 
-    public void disminuirCombustible(int i, ArrayList<Avion> listaAviones) {
+
+    public void disminuirCombustible() {
 
         int x = this.combustible - eficiencia;
 
-        System.out.println(x);
+
 
         //Si el avion se queda sin combustible
         if (x <= 0){
 
-            destruirAvion(i,listaAviones);
+            destruirAvion();
 
         }
         else {
@@ -239,7 +269,42 @@ public class Avion extends Rectangle implements Serializable {
         return recargando_combustible;
     }
 
+    public int getCombustible() {
+        return combustible;
+    }
+
     public void setRecargando_combustible(boolean recargando_combustible) {
         this.recargando_combustible = recargando_combustible;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public boolean isFue_recargado() {
+        return fue_recargado;
+    }
+
+    public void setFue_recargado(boolean fue_recargado) {
+        this.fue_recargado = fue_recargado;
+    }
+
+    public double getDistancia() {
+        return distancia;
+    }
+
+    public void setCombustible(int combustible) {
+        this.combustible = combustible;
+    }
+
+    public void setDistancia(double distancia) {
+        this.distancia = distancia;
+    }
+
+    @Override
+    public String toString() {
+        return "Avion{" +
+                "nombre='" + nombre + '\'' +
+                '}';
     }
 }
