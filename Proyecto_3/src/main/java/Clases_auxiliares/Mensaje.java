@@ -3,169 +3,132 @@ package Clases_auxiliares;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * Clase que representa un mensaje en el sistema.
+ */
 public class Mensaje implements Serializable {
 
-    //Acción que debe interpretar el receptor
+    // Acción que debe interpretar el receptor
     private String accion;
 
-    //Información de los Portaaviones
+    // Información de los Portaaviones
 
-    //Índice del objeto
+    // Índice del objeto
     private int i;
 
-    //Cantidad de aviones en el hangar
+    // Cantidad de aviones en el hangar
     private int hangar;
 
-    //Combustible de la plataforma
-    private int combustiblePlataforma;
+    // Combustible de la plataforma
+    private int combustible;
 
-    //Lista de mensajes
-    private ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+    // Lista de mensajes
+    ArrayList<Mensaje> listaMensajes = new ArrayList<>();
 
-    //Sector de aviones
-    private String nombreAvion;
-    private boolean recargandoCombusible;
-    private int combustibleAvion;
-    private int fortaleza;
-    private int eficiencia;
-    private int velocidad;
-    private double distancia;
-
-
-
-    //Avion
-    private Avion avion;
-
-    public Mensaje(){
-
+    /**
+     * Constructor sin argumentos de la clase Mensaje.
+     */
+    public Mensaje() {
     }
 
-
-    public Mensaje(String accion){
-
+    /**
+     * Constructor de la clase Mensaje.
+     *
+     * @param accion La acción a ser interpretada por el receptor.
+     */
+    public Mensaje(String accion) {
         this.accion = accion;
-
     }
 
-
-    public String getAccion(){
+    /**
+     * Obtiene la acción del mensaje.
+     *
+     * @return La acción del mensaje.
+     */
+    public String getAccion() {
         return accion;
     }
 
+    /**
+     * Obtiene el índice del objeto.
+     *
+     * @return El índice del objeto.
+     */
     public int getI() {
         return i;
     }
 
+    /**
+     * Establece el índice del objeto.
+     *
+     * @param i El índice del objeto.
+     */
     public void setI(int i) {
         this.i = i;
     }
 
+    /**
+     * Obtiene la cantidad de aviones en el hangar.
+     *
+     * @return La cantidad de aviones en el hangar.
+     */
     public int getHangar() {
         return hangar;
     }
 
+    /**
+     * Establece la cantidad de aviones en el hangar.
+     *
+     * @param hangar La cantidad de aviones en el hangar.
+     */
     public void setHangar(int hangar) {
         this.hangar = hangar;
     }
 
-    public int getCombustiblePlataforma() {
-        return combustiblePlataforma;
+    /**
+     * Obtiene el combustible de la plataforma.
+     *
+     * @return El combustible de la plataforma.
+     */
+    public int getCombustible() {
+        return combustible;
     }
 
-    public void setCombustiblePlataforma(int combustiblePlataforma) {
-        this.combustiblePlataforma = combustiblePlataforma;
+    /**
+     * Establece el combustible de la plataforma.
+     *
+     * @param combustible El combustible de la plataforma.
+     */
+    public void setCombustible(int combustible) {
+        this.combustible = combustible;
     }
 
+    /**
+     * Obtiene la lista de mensajes.
+     *
+     * @return La lista de mensajes.
+     */
     public ArrayList<Mensaje> getListaMensajes() {
         return listaMensajes;
     }
 
+    /**
+     * Establece la lista de mensajes.
+     *
+     * @param listaMensajes La lista de mensajes.
+     */
     public void setListaMensajes(ArrayList<Mensaje> listaMensajes) {
         this.listaMensajes = listaMensajes;
     }
 
-    public Avion getAvion() {
-        return avion;
-    }
-
-    public void setAvion(Avion avion) {
-        this.avion = avion;
-    }
-
-    public String getNombreAvion() {
-        return nombreAvion;
-    }
-
-    public void setNombreAvion(String nombreAvion) {
-        this.nombreAvion = nombreAvion;
-    }
-
-    public boolean isRecargandoCombustible() {
-        return recargandoCombusible;
-    }
-
-    public void setRecargandoCombustible(boolean recargandoCombusible) {
-        this.recargandoCombusible = recargandoCombusible;
-    }
-
-    public int getCombustibleAvion() {
-        return combustibleAvion;
-    }
-
-    public void setCombustibleAvion(int combustibleAvion) {
-        this.combustibleAvion = combustibleAvion;
-    }
-
-    public int getFortaleza() {
-        return fortaleza;
-    }
-
-    public void setFortaleza(int fortaleza) {
-        this.fortaleza = fortaleza;
-    }
-
-    public int getEficiencia() {
-        return eficiencia;
-    }
-
-    public void setEficiencia(int eficiencia) {
-        this.eficiencia = eficiencia;
-    }
-
-    public int getVelocidad() {
-        return velocidad;
-    }
-
-    public void setVelocidad(int velocidad) {
-        this.velocidad = velocidad;
-    }
-
-    public boolean isRecargandoCombusible() {
-        return recargandoCombusible;
-    }
-
-    public void setRecargandoCombusible(boolean recargandoCombusible) {
-        this.recargandoCombusible = recargandoCombusible;
-    }
-
-    public double getDistancia() {
-        return distancia;
-    }
-
-    public void setDistancia(double distancia) {
-        this.distancia = distancia;
-    }
-
-    public Mensaje getMensaje(){
-        return this;
-    }
-
+    /**
+     * Devuelve una representación en forma de cadena del objeto Mensaje.
+     *
+     * @return La representación en forma de cadena del objeto Mensaje.
+     */
     @Override
-    public String toString(){
-
+    public String toString() {
         return String.valueOf(i);
-
     }
-
-
 }
+

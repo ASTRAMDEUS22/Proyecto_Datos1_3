@@ -12,7 +12,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-
+/**
+ * Esta clase permite realizar tareas en un intevalo de tiempo
+ */
 public class Temporizador {
 
     private final static Duration intervalo = Duration.seconds(1);
@@ -23,6 +25,12 @@ public class Temporizador {
     private static final String host = "localhost";
     private static final int serverPort = 2222;
 
+    /**
+     * Constructor de la clase Temporizador
+     * @param listaAviones lista de aviones
+     * @param listaPortaaviones lista de portaaviones
+     * @param listaAeropuertos lista de aeropuertos
+     */
     public Temporizador(
             //ArrayList<Avion> listaAviones,
             ArrayList<Portaaviones> listaPortaaviones,
@@ -34,6 +42,9 @@ public class Temporizador {
 
     }
 
+    /**
+     * Este metodo se encarga de iniciar el contador del temporizador
+     */
     public void iniciarCont() {
         Timeline timeline = new Timeline(new KeyFrame(intervalo, new EventHandler<ActionEvent>() {
             @Override
@@ -55,6 +66,9 @@ public class Temporizador {
         timeline.play();
     }
 
+    /**
+     * Este metodo se encarga de verificar la cantidad de hangares en cada aeropuerto y portaavion
+     */
     private void verificarHangares(){
 
         for (Portaaviones portaaviones : listaPortaaviones){
@@ -77,6 +91,9 @@ public class Temporizador {
         }
     }
 
+    /**
+     * Este metodo se encarga de verificar si los aviones deben de recargar combustible
+     */
     public void verificarAviones(){
 
         //Verifica si la lista de aviones esta vacía
@@ -137,6 +154,9 @@ public class Temporizador {
 
     }
 
+    /**
+     * Este metodo se encarga de recargar el combustible en los aeropuertos y los portaaviones
+     */
     public void recargaCombustiblePlataformas(){
 
         for (Portaaviones portaaviones: listaPortaaviones){
@@ -152,6 +172,11 @@ public class Temporizador {
 
     }
 
+    /**
+     * Este metodo se encarga de disminuir el combustible
+     * @param avion avion al cual se le va disminuir el combustible
+     * @param i cantidad de combustible a disminuir
+     */
     private void disminuirCombustible(Avion avion,int i) {
 
         avion.disminuirCombustible();
