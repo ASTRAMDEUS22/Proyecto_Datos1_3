@@ -25,12 +25,6 @@ public class Temporizador {
     private static final String host = "localhost";
     private static final int serverPort = 2222;
 
-    /**
-     * Constructor de la clase Temporizador
-     * @param listaAviones lista de aviones
-     * @param listaPortaaviones lista de portaaviones
-     * @param listaAeropuertos lista de aeropuertos
-     */
     public Temporizador(
             //ArrayList<Avion> listaAviones,
             ArrayList<Portaaviones> listaPortaaviones,

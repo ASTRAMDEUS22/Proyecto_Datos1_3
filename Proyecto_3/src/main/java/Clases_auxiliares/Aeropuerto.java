@@ -62,9 +62,10 @@ public class Aeropuerto extends Portaaviones {
     private Label cantidadCombustible = new Label();
 
 
-    /**
-     * Constructor de la clase
-     */
+
+
+
+
     public Aeropuerto(){
 
         setWidth(ancho);  //Ancho

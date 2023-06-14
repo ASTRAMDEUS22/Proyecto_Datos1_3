@@ -8,35 +8,44 @@ import java.util.ArrayList;
  */
 public class Mensaje implements Serializable {
 
-    // Acción que debe interpretar el receptor
+    //Acción que debe interpretar el receptor
     private String accion;
 
-    // Información de los Portaaviones
+    //Información de los Portaaviones
 
-    // Índice del objeto
+    //Índice del objeto
     private int i;
 
-    // Cantidad de aviones en el hangar
+    //Cantidad de aviones en el hangar
     private int hangar;
 
-    // Combustible de la plataforma
-    private int combustible;
+    //Combustible de la plataforma
+    private int combustiblePlataforma;
 
-    // Lista de mensajes
-    ArrayList<Mensaje> listaMensajes = new ArrayList<>();
+    //Lista de mensajes
+    private ArrayList<Mensaje> listaMensajes = new ArrayList<>();
 
-    /**
-     * Constructor sin argumentos de la clase Mensaje.
-     */
-    public Mensaje() {
+    //Sector de aviones
+    private String nombreAvion;
+    private boolean recargandoCombusible;
+    private int combustibleAvion;
+    private int fortaleza;
+    private int eficiencia;
+    private int velocidad;
+    private double distancia;
+
+
+
+    //Avion
+    private Avion avion;
+
+    public Mensaje(){
+
     }
 
-    /**
-     * Constructor de la clase Mensaje.
-     *
-     * @param accion La acción a ser interpretada por el receptor.
-     */
-    public Mensaje(String accion) {
+
+    public Mensaje(String accion){
+
         this.accion = accion;
     }
 
@@ -85,22 +94,12 @@ public class Mensaje implements Serializable {
         this.hangar = hangar;
     }
 
-    /**
-     * Obtiene el combustible de la plataforma.
-     *
-     * @return El combustible de la plataforma.
-     */
-    public int getCombustible() {
-        return combustible;
+    public int getCombustiblePlataforma() {
+        return combustiblePlataforma;
     }
 
-    /**
-     * Establece el combustible de la plataforma.
-     *
-     * @param combustible El combustible de la plataforma.
-     */
-    public void setCombustible(int combustible) {
-        this.combustible = combustible;
+    public void setCombustiblePlataforma(int combustiblePlataforma) {
+        this.combustiblePlataforma = combustiblePlataforma;
     }
 
     /**
@@ -121,14 +120,84 @@ public class Mensaje implements Serializable {
         this.listaMensajes = listaMensajes;
     }
 
-    /**
-     * Devuelve una representación en forma de cadena del objeto Mensaje.
-     *
-     * @return La representación en forma de cadena del objeto Mensaje.
-     */
-    @Override
-    public String toString() {
-        return String.valueOf(i);
+    public Avion getAvion() {
+        return avion;
     }
-}
 
+    public void setAvion(Avion avion) {
+        this.avion = avion;
+    }
+
+    public String getNombreAvion() {
+        return nombreAvion;
+    }
+
+    public void setNombreAvion(String nombreAvion) {
+        this.nombreAvion = nombreAvion;
+    }
+
+    public boolean isRecargandoCombustible() {
+        return recargandoCombusible;
+    }
+
+    public void setRecargandoCombustible(boolean recargandoCombusible) {
+        this.recargandoCombusible = recargandoCombusible;
+    }
+
+    public int getCombustibleAvion() {
+        return combustibleAvion;
+    }
+
+    public void setCombustibleAvion(int combustibleAvion) {
+        this.combustibleAvion = combustibleAvion;
+    }
+
+    public int getFortaleza() {
+        return fortaleza;
+    }
+
+    public void setFortaleza(int fortaleza) {
+        this.fortaleza = fortaleza;
+    }
+
+    public int getEficiencia() {
+        return eficiencia;
+    }
+
+    public void setEficiencia(int eficiencia) {
+        this.eficiencia = eficiencia;
+    }
+
+    public int getVelocidad() {
+        return velocidad;
+    }
+
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
+    }
+
+    public boolean isRecargandoCombusible() {
+        return recargandoCombusible;
+    }
+
+    public void setRecargandoCombusible(boolean recargandoCombusible) {
+        this.recargandoCombusible = recargandoCombusible;
+    }
+
+    public double getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(double distancia) {
+        this.distancia = distancia;
+    }
+
+    @Override
+    public String toString(){
+
+        return String.valueOf(i);
+
+    }
+
+
+}
