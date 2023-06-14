@@ -1,0 +1,23 @@
+
+‹
+java:S1319½"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(êêý8ö¨Ð²‹1
+‚
+java:S1319Á"dThe type of "hashMap" should be an interface such as "Map" rather than the implementation "HashMap".(Âò¥ó8÷¨Ð²‹1
+Š
+java:S1319Í"lThe type of "listaAviones" should be an interface such as "List" rather than the implementation "ArrayList".(ÔŽÁ8ø¨Ð²‹1
+n	java:S117µ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŒŒ´8ù¨Ð²‹1
+n	java:S117¹"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÇÊÊ8ú¨Ð²‹1
+t	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(žßÅÜýÿÿÿÿ
+z	java:S116("^Rename this field "recarga_por_segundo" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¬‰«á8Â¯Ð²‹1
+>
+java:S1170("!Make this final field static too.(¬‰«á8Û°Ð²‹1
+C
+java:S11704"!Make this final field static too.(‰Ï¶öýÿÿÿÿ8ì°Ð²‹1
+?
+java:S1659""Declare "alto" on a separate line.(…ÓÑ¶8û°Ð²‹1
+7
+java:S1659O"!Declare "max" on a separate line.(Å€åœ
+`
+java:S1155d">Use isEmpty() to check whether the collection is empty or not.(ó÷¿–ùÿÿÿÿ8ÏµÐ²‹1
+J
+java:S1602ª",Remove useless curly braces around statement(ÃÉþ©8ßµÐ²‹1
