@@ -13,6 +13,8 @@ public class GeneradorNombres {
     /**
      * Método principal que permite al usuario generar nombres de aviones de forma interactiva.
      * Los nombres generados se almacenan en una lista y se imprimen al final.
+     *
+     * @param args los argumentos de la línea de comandos (no se utilizan en este caso)
      */
     public static void main(String[] args) {
         List<String> nombres = new ArrayList<>();
@@ -34,6 +36,20 @@ public class GeneradorNombres {
         }
 
         System.out.println("Lista de nombres de aviones generados:");
+        for (String nombre : nombres) {
+            System.out.println(nombre);
+        }
+
+        // Ordenar la lista de nombres utilizando insertion sort
+        insertionSort(nombres);
+        System.out.println("\nLista de nombres de aviones ordenada por Insertion Sort:");
+        for (String nombre : nombres) {
+            System.out.println(nombre);
+        }
+
+        // Ordenar la lista de nombres utilizando shell sort
+        shellSort(nombres);
+        System.out.println("\nLista de nombres de aviones ordenada por Shell Sort:");
         for (String nombre : nombres) {
             System.out.println(nombre);
         }
@@ -78,7 +94,47 @@ public class GeneradorNombres {
         }
         return sb.toString();
     }
+
+    /**
+     * Ordena una lista de nombres utilizando el algoritmo de ordenamiento de inserción (insertion sort).
+     *
+     * @param nombres la lista de nombres a ordenar
+     */
+    private static void insertionSort(List<String> nombres) {
+        int n = nombres.size();
+        for (int i = 1; i < n; ++i) {
+            String key = nombres.get(i);
+            int j = i - 1;
+
+            while (j >= 0 && nombres.get(j).compareTo(key) > 0) {
+                nombres.set(j + 1, nombres.get(j));
+                j = j - 1;
+            }
+            nombres.set(j + 1, key);
+        }
+    }
+
+    /**
+     * Ordena una lista de nombres utilizando el algoritmo de ordenamiento de Shell (shell sort).
+     *
+     * @param nombres la lista de nombres a ordenar
+     */
+    private static void shellSort(List<String> nombres) {
+        int n = nombres.size();
+        for (int gap = n / 2; gap > 0; gap /= 2) {
+            for (int i = gap; i < n; i += 1) {
+                String temp = nombres.get(i);
+                int j;
+                for (j = i; j >= gap && nombres.get(j - gap).compareTo(temp) > 0; j -= gap) {
+                    nombres.set(j, nombres.get(j - gap));
+                }
+                nombres.set(j, temp);
+            }
+        }
+    }
 }
+
+
 
 
 
