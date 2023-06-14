@@ -23,9 +23,15 @@ import java.util.Objects;
 import java.util.Random;
 
 
+/**
+ * Esta clase contiene la logica del juego principal, AirWar
+ */
 public class
 AirWar extends Application implements Runnable{
-
+    /**
+     * Entrada principal del juego en JavaFX
+     * @param args argumentos que se pasan al juego
+     */
     public static void main(String[] args) {
         launch(args);
     }
@@ -65,7 +71,9 @@ AirWar extends Application implements Runnable{
             listaAeropuertos
     );
 
-
+    /**
+     * Este metodo inicia un Hilo para el juego
+     */
     public AirWar(){
 
         try {
@@ -79,7 +87,10 @@ AirWar extends Application implements Runnable{
 
     }
 
-
+    /**
+     * Este metodo genera el apartado grafico del juego, como los portaviones y aeropuertos, que representan los nodos de un grafo, ademas inicia el temporizador
+     * @param primaryStage la escena del juego
+     */
     @Override
     public void start(Stage primaryStage) {
 
@@ -185,6 +196,9 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Este metodo genera las aristas entre los nodos del grafo generado
+     */
     public void crearAristas() {
 
         generarLineaPortaaviones();
@@ -192,6 +206,9 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Este metodo genera las aristas de los portaaviones de forma aleatoria
+     */
     public void generarLineaPortaaviones(){
 
         //Ejecuta mientras el índice este en la lista
@@ -235,6 +252,9 @@ AirWar extends Application implements Runnable{
         }
     }
 
+    /**
+     * Este metodo genera las aristas de los aeropuertos de forma aleatoria
+     */
     public void generarLineaAeropuerto(){
 
         //Ejecuta mientras el índice este en la lista
@@ -279,19 +299,40 @@ AirWar extends Application implements Runnable{
         }
     }
 
+    /**
+     * Este metodo genera una posicion aleatoria en el eje X
+     * @return la posicion generada
+     */
     private int generarCoordsRandomX(){
         return random.nextInt(maxAncho - minAncho + 1) + minAncho;
     }
-
+    /**
+     * Este metodo genera una posicion aleatoria en el eje Y
+     * @return la posicion generada
+     */
     private int generarCoordsRandomY() {
         return random.nextInt(maxAlto - minAlto + 1) + minAlto;
     }
 
-    private int generarPortaRandom(){return random.nextInt(maxPorta - minPorta + 1) + minPorta;}
+    /**
+     * Genera un portaaviones aleatorio
+     * @return portaaviones generado
+     */
+    private int generarPortaRandom(){
+        return random.nextInt(maxPorta - minPorta + 1) + minPorta;
+    }
 
+    /**
+     * Genera un aeropuerto aleatorio
+     * @return aeropuerto generado
+     */
     private int generarAeroRandom(){return random.nextInt(maxAero - minAero + 1) + minAero;}
 
-
+    /**
+     * Conecta un portaaviones con un portaaviones aleatorio
+     * @param portaaviones portaaviones
+     * @param portaavionesRandom portaaviones
+     */
     public void generaPortaPorta(Portaaviones portaaviones,Portaaviones portaavionesRandom){
 
         LineaArista lineaArista = new LineaArista();
@@ -307,6 +348,11 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Conecta un aeropuerto con un aeropuerto aleatoria
+     * @param aeropuerto aeropuerto
+     * @param aeropuertoRandom aeropuerto aleatorio
+     */
     public void generaAeroAero(Aeropuerto aeropuerto,Aeropuerto aeropuertoRandom){
 
         LineaArista lineaArista = new LineaArista();
@@ -323,6 +369,11 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Conecta un portaaviones con un aeropuerto aleatorio
+     * @param portaaviones portaaviones
+     * @param aeropuertoRandom aeropuerto aleatorio
+     */
     public void generaPortaAero(Portaaviones portaaviones,Aeropuerto aeropuertoRandom){
 
         LineaArista lineaArista = new LineaArista();
@@ -339,6 +390,11 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Conecta un aeropuerto con un portaviones aleatorio
+     * @param aeropuerto aeropuerto
+     * @param portaavionesRandom portaviones aleatorio
+     */
     public void generaAeroPorta(Aeropuerto aeropuerto,Portaaviones portaavionesRandom){
 
         LineaArista lineaArista = new LineaArista();
@@ -355,6 +411,9 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Este metodo se encarga de generar aviones
+     */
     public void generarAviones(){
 
         Mensaje mensaje = new Mensaje("listaPortaaviones");
@@ -391,12 +450,20 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Este metodo se encarga de crear aviones
+     * @param i
+     */
     public void crearAvion(int i){
 
         listaPortaaviones.get(i).instanciarAviones();
 
     }
 
+    /**
+     * Este metodo se encarga de enviar un mensaje a traves de la conexion por sockets
+     * @param mensaje mensaje que se quiere enviar
+     */
     public void enviarMensajeServidor(Mensaje mensaje){
 
         try {
@@ -418,6 +485,9 @@ AirWar extends Application implements Runnable{
 
     }
 
+    /**
+     * Este metodo se encarga de inicializar la conexion por sockets
+     */
     @Override
     public void run(){
 
@@ -452,7 +522,6 @@ AirWar extends Application implements Runnable{
         }
 
     }
-
 
 
 }

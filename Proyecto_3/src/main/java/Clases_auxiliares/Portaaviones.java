@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Random;
 
-
+/**
+ * Esta clase contiene todos los aspectos relacionados a los portaaviones que se utilizan en el juego
+ */
 public class Portaaviones extends Rectangle implements Serializable {
 
     //Imagen del aeropuerto
@@ -53,6 +55,9 @@ public class Portaaviones extends Rectangle implements Serializable {
     //Instancia de un Timeline para manejar la generación de aviones cada n segundos
     private Timeline timeline;
 
+    /**
+     * Constructor de la clase
+     */
     public Portaaviones(){
 
         setWidth(22);  //Ancho del objeto
@@ -62,6 +67,9 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     *
+     */
     public void crearLabel(){
 
         label.setTranslateX(getX() + 25);
@@ -76,6 +84,9 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     *
+     */
     public void instanciarAviones(){
 
         //Aqui debe ir el llamado al algoritmo para determinar la mejor ruta
@@ -193,6 +204,10 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     * Se encarga de verificar si el combustible es igual o mayor a la racion
+     * @return x si se cumple, 0 en caso de que no
+     */
     public int solicitarRecarga(){
 
         //Si el cumbustible es igual o mayor a la ración, darle el combustible, si no, no
@@ -206,6 +221,10 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     * Se encarga de regargar el combustible al portaavion
+     * @param recarga recarga
+     */
     private void recargarCombustiblePortaavion(int recarga){
 
         if (combustible + recarga >= 100){
@@ -216,7 +235,9 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
-
+    /**
+     * Genera aviones en el hangar
+     */
     public void generarAvionHangar(){
 
         int numRandom = random.nextInt(3);
@@ -232,6 +253,10 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     * Se encarga de racionar el combustible
+     * @return resultado
+     */
     private int racionarCombustible(){
 
         int min = 3, max = 5;
@@ -242,14 +267,26 @@ public class Portaaviones extends Rectangle implements Serializable {
 
     }
 
+    /**
+     * Coloca la linea de salida del portaavion
+     * @param linea_salida linea de salida
+     */
     public void setLinea_salida(LineaArista linea_salida) {
         listaLineasSalida.add(linea_salida);
     }
 
+    /**
+     * Coloca la linea de llegada del portaavion
+     * @param linea_llegada linea de llegada
+     */
     public void setLinea_llegada(LineaArista linea_llegada){
         listaLineasLlegada.add(linea_llegada);
     }
 
+    /**
+     * Obtiene el texto del Label
+     * @return labelText
+     */
     public String getLabelText() {
         return labelText;
     }
@@ -263,11 +300,17 @@ public class Portaaviones extends Rectangle implements Serializable {
         this.pane = pane;
     }
 
+    /**
+     * Obtiene el combustible
+     * @return combustible
+     */
     public double getCombustible() {
         return combustible;
     }
 
-    //Agregar un avión al portaaviones
+    /**
+     * Agrega un avión al portaaviones
+     */
     public boolean almacenarAvion(Avion avion){
         if (hangar.size() < limiteAviones) {
             hangar.add(avion);
@@ -309,6 +352,9 @@ public class Portaaviones extends Rectangle implements Serializable {
         this.listaAviones = listaAviones;
     }
 
+    /**
+     * llama al metodo recargarCombustiblePortaavion
+     */
     public void llenarTanquePortaavion(){
         recargarCombustiblePortaavion(recarga_por_segundo);
     }

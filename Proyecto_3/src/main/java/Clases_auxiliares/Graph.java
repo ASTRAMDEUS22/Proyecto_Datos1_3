@@ -127,12 +127,25 @@ public class Graph {
         }
         return true;
     }
+
+    /**
+     * Este metodo aumenta el peso de una arista segun el nivel de peligro
+     * @param i primer vertice de la arista
+     * @param j segundo vertice de la arista
+     * @param increment cantidad a aumentar
+     */
     public void increaseWeight(int i, int j, int increment) {
         if (matB[i][j]) {
             mat[i][j] += increment;
             mat[j][i] += increment;
         }
     }
+
+    /**
+     * Este metodo reduce el peso de la arista afectada por el peligro cada segundo hasta que alcance el peso original
+     * @param i primer vertice de la arista
+     * @param j segundo vertice de la arista
+     */
     public void decrementWeightPeriodically(final int i, final int j) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -149,6 +162,11 @@ public class Graph {
         }, 5000, 5000);
     }
 
+    /**
+     * Este metodo reduce el peso de la arista que se ve afectada por el aumento en el peligro
+     * @param i primer vertice de la arista
+     * @param j segundo vertice de la arista
+     */
     private void decreaseWeightByOne(int i, int j) {
         if (matB[i][j] && mat[i][j] > defWeight) {
             mat[i][j]--;

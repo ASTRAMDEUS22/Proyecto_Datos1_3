@@ -143,6 +143,10 @@ public class Main {
             System.out.println("Nodo:"+(from+1)+" No esta conectado:"+(to+1));
         }
     }
+
+    /**
+     * Este metodo inicializa el Controller, ademas agrega un data listener para la informacion que viene desde el Arduino, en este caso al presionar los botones up, down y select
+     */
     public static void ArduinoController(){
         serialPort = SerialPort.getCommPort("COM6");
         serialPort.openPort();
@@ -179,11 +183,20 @@ public class Main {
         });
         Runtime.getRuntime().addShutdownHook(new Thread(serialPort::closePort));
     }
+
+    /**
+     * Este metodo permite enviar informacion al Controller
+     * @param data informacion que se quiere enviar
+     */
     public static void sendData(String data){
         byte[] message = data.getBytes();
         System.out.println("pass");
         serialPort.writeBytes(message,message.length);
     }
+
+    /**
+     * Loop que enciende los LEDs del Controller secuencialmente
+     */
     public static void loop() {
         while (counting) {
             String message = String.valueOf(counter);
@@ -208,36 +221,10 @@ public class Main {
             }
         }
     }
-    /*
-    public static void insertionSort(){
-        int in;
-        int out;
-        for (out = 1; out < vList.length; out++){
-            long temp = vList[out];
-            in = out;
-            while (in > 0 && vList[in-1] >= temp){
-                vList[in] = vList[in-1];
-                --in;
-            }
-            vList[in] = temp;
-        }
-    }
-    public static void shellSort(Comparable[] a){
-        int N = efList.length;
-        int h = 1;
-        while(h < N/3) h = 3*h +1;
-        while (h >= 1){
-            for (int i = h; i < N; i++){
-                for (int j = i; j >= h && efList[j] < efList[j-h]; j -= h){
-                    Comparable temp = efList[j];
-                    efList[j] = efList[j - h];
-                    efList[j - h] = temp
-                }
-            }
-            h /= 3;
-        }
-    }
-    */
+    /**
+     * Algoritmo Insertion Sort para la lista de velocidad
+     * @param list lista que se quiere ordenar
+     */
     public static void insertionSort(LinkedList<Long> list) {
         for (int i = 1; i < list.size(); i++) {
             long temp = list.get(i);
@@ -249,6 +236,11 @@ public class Main {
             list.set(j + 1, temp);
         }
     }
+
+    /**
+     * Algoritmo Shell Sort para la lista de eficiencia
+     * @param list lista que se quiere ordenar
+     */
     public static void shellSort(LinkedList<Comparable> list) {
         int N = list.size();
         int h = 1;
